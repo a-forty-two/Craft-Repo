@@ -1,0 +1,312 @@
+---First download hadoop at
+	wget http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/hadoop-0.20.205.0.tar.gz
+
+---unpack hadoop using
+	gunzip hadoop-0.20.205.0.tar.gz
+	tar xvf hadoop-0.20.205.0.tar
+
+---install ant
+	sudo yum install ant
+
+---export java
+	export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk.x86_64
+
+---run ant
+	ant
+
+---conf the env file
+	nano conf/hadoop-env.sh
+	export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk.x86_64
+
+---edit the config files below
+
+	core site
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!-- Put site-specifi c property overrides in this fi le. -->
+<configuration>
+<property>
+<name>fs.default.name</name>
+<value>hdfs://172.31.7.5:9000</value> 
+<description>The name of the default file system. A URI whosescheme and authority determine the FileSystem implementation.</description>
+</property>
+</configuration>
+
+
+	mapred-site
+
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!-- Put site-specifi c property overrides in this fi le. -->
+<configuration>
+<property>
+<name>mapred.job.tracker</name>
+<value>172.31.7.5:9001</value>
+<description>The host and port that the MapReduce job tracker runsat.</description>
+</property>
+</configuration>
+
+
+	hdfs-site
+
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+<property>
+<name>dfs.replication</name>
+<value>1</value>
+<description>The actual number of replications can be specifi ed when thefi le is created.</description>
+</property>
+</configuration>
+
+---edit slaves and maseters
+	172.31.7.5
+	172.31.5.20
+	172.31.12.64
+
+
+---format namenode
+	bin/hadoop namenode -format  
+
+---get the key setup
+	ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
+	cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys
+
+--- tar cvf myHadoop.tar hadoop-0.20.205.0
+
+--- scp myHadoop.tar ec2-user@54.187.63.189:/home/ec2-user/myHadoopWorker.tar
+
+--- reset nodes
+	rm -Rf /tmp/hadoop-ec2-user/mapred/
+	rm -Rf /tmp/hadoop-ec2-user/dfs/
+
+--- bin/hadoop dfsadmin -report
+
+---mapper 
+
+#!/usr/bin/python
+
+import sys
+
+dict = {}
+counter = 0
+
+for text in sys.stdin:
+	text = text.strip()
+	text = text.split(',')
+
+	dict[counter] = []
+
+	for i in range(0,5):
+		dict[counter].append(text[i])
+	counter += 1
+
+for key,value in dict.items():
+	print '%s\t%s' % (key,value)
+
+
+---reducer
+
+#!/usr/bin/python
+
+import sys
+
+dictionary = {}
+distances = {}
+
+for line in sys.stdin:
+	line = line.strip()
+	line = line.split('\t')
+
+	rang = list(range(1,1000))
+	rang = [str(i) for i in rang]
+
+	if line[0] in rang:
+
+		key = line[0]
+		value = line[1]
+		value = value.replace('[','')
+		value = value.replace(']','')
+		value = value.replace("'",'')
+
+		value = value.split(',')
+		dictionary[key] = []
+
+		for i in value:
+			i = int(i.split('.')[0])
+			dictionary[key].append(i)
+
+for key,value in dictionary.items():
+	distances[key] = []
+
+	for key1, value1 in dictionary.items():
+		zipper = zip(value,value1)
+		diff = [x - y for x,y in zipper]
+		diff = [i ** 2 for i in diff]
+		dist = sum(diff)
+		pair = [key1,dist]
+
+		distances[key].append(pair)
+
+for key,value in distances.items():
+	print '%s\t%s' % (key,value)
+
+
+--- bin/hadoop fs -mkdir /data/
+
+--- bin/hadoop fs -put vehicles.csv /data/vehicles.csv
+
+--- bin/hadoop jar hadoop-streaming-0.20.205.0.jar -input /data/ -output /output -mapper mapper.py -reducer reducer.py -file mapper.py -file reducer.py
+
+--- wget http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/hadoop-streaming-0.20.205.0.jar
+
+--- ssh 172.31.5.20
+
+--- bin/hadoop fs -rmr /output
+
+--- scp -i aws_key.pem spark-1.3.1-bin-hadoop2.4.tgz ec2-user@54.187.46.128:/home/ec2-user/spark.tgz
+
+
+
+
+
+<property>
+<name>mapred.compress.map.output</name>
+<value>true</value>
+</property>
+<property>
+<name>mapred.map.output.compression.codec</name>
+<value>org.apache.hadoop.io.compress.SnappyCodec</value>
+</property>
+
+
+
+
+#Hadoop Streaming Code
+bin/hadoop jar hadoop-streaming-0.20.205.0.jar \
+-input /data/ \
+-output /output \
+-mapper mapper.py \
+-reducer reducer.py \
+-file mapper.py \
+-file reducer.py
+
+#Hadoop Streaming .deflate file
+bin/hadoop jar hadoop-streaming-0.20.205.0.jar \
+-D mapred.output.compress=true \
+-D mapred.output.compression.codec=org.apache.hadoop.io.compress.GzipCodec \
+-input /data/ \
+-output /output \
+-mapper mapper.py \
+-reducer reducer.py \
+-file mapper.py \
+-file reducer.py
+
+
+#Hadoop Streaming .gz file
+bin/hadoop jar hadoop-streaming-0.20.205.0.jar \
+-D mapred.output.compress=true \
+-D mapred.output.compression.type=BLOCK \
+-D mapred.output.compression.codec=org.apache.hadoop.io.compress.GzipCodec \
+-input /data/ \
+-output /output \
+-mapper mapper.py \
+-reducer reducer.py \
+-file mapper.py \
+-file reducer.py
+
+
+
+/home/ec2-user/hadoop-0.20.205.0/vehicle.csv
+
+
+#load the data
+data = sc.textFile("file:///home/ec2-user/hadoop-0.20.205.0/vehicles.csv").map(lambda line: line.split(","))
+
+#get columns
+header = data.first()
+
+#get ride of the headers
+data = data.filter(lambda line: line != header)
+
+
+>>dictionary = {}
+>>> counter = 0
+>>> for line in data.take(5000):
+...     lst = []
+...     one = float(line[0])
+...     two = float(line[1])
+...     three = float(line[2])
+...     four = float(line[3])
+...     five = int(line[4])
+...     lst.append(one)
+...     lst.append(two)
+...     lst.append(three)
+...     lst.append(four)
+...     lst.append(five)
+...     dictionary[counter] = lst
+...     counter += 1
+
+
+dist = {}
+>>> for key,value in dictionary.items():
+			dist[key] = []
+
+...     for key1, value1 in dictionary.items():
+...             zipper = zip(value, value1)
+...             diff = [x - y for x,y in zipper]
+...             diff = [i ** 2 for i in diff]
+				dist1 = sum(diff)
+...             pair = [key1,dist1]
+...             dist[key].append(pair)
+
+
+
+
+
+#!/usr/bin/python
+import sys
+dictionary = {}
+distances = {}
+
+
+for line in sys.stdin:
+
+        line = line.strip()
+        line = line.split('\t')
+        rang = list(range(1,5000))
+        rang = [str(i) for i in rang]
+        if line[0] in rang:
+
+                key = line[0]
+                value = line[1]
+                value = value.replace('[','')
+                value = value.replace(']','')
+                value = value.replace("'",'')
+                value = value.split(',')
+                dictionary[key] = []
+
+                for i in value:
+                        i = int(i.split('.')[0])
+                        dictionary[key].append(i)
+
+for key,value in dictionary.items():
+
+        distances[key] = []
+
+        for key1, value1 in dictionary.items():
+
+                zipper = zip(value,value1)
+                diff = [x - y for x,y in zipper]
+                diff = [i ** 2 for i in diff]
+                dist = sum(diff)
+                pair = [key1,dist]
+                distances[key].append(pair)
+for key,value in distances.items():
+        print '%s\t%s' % (key, value)
+
+
+
+
+
+
