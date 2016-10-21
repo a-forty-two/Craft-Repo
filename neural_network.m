@@ -1,32 +1,56 @@
 %Brian Craft | craft1.brian@gmail.com
 %neural network csc578 project 1
 
-function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta)
+function [mse_train_array,mse_val_array,mse_test_array,accuracy_train_array,accuracy_val_array,accuracy_test_array] = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation)
 
+  %Checklist
+  %[mse_train_array,mse_val_array,mse_test_array,accuracy_train_array,accuracy_val_array,accuracy_test_array] = neural_network(nodeLayer, iris_x.', iris_y.', batchSize, epochs, eta, test_validation)
+  
+  %Test and Validation: vector [80,10,10]
+  %split inputs
+  [train_ind,val_ind,test_ind] = dividerand(length(inputs),test_validation(1),test_validation(2),test_validation(3));
+  input_train = inputs(:,train_ind);
+  input_val = inputs(:,val_ind);
+  input_test = inputs(:,test_ind);
+  
+  %pass the indicies to the targets as well
+  target_train = targets(:,train_ind);
+  target_val = targets(:,val_ind);
+  target_test = targets(:,test_ind);
+  
+  %Return accuracy and cost on each data partition (test, training, validation) after each epoch and so plots can be made
+  epoch_array = [];
+  mse_train_array = [];
+  mse_val_array = [];
+  mse_test_array = [];
+  
+  accuracy_train_array = [];
+  accuracy_val_array = [];
+  accuracy_test_array = [];
+  
   %{
+  Early Stopping: When error/cost on the validation/test increases after
+  some number of epochs
 
-  Checklist
+  Cost: Quadratic, Cross Entropy, Log Likelinhood
 
-  Completed: 
-    Evenything was completed
-  Pseudocode  
-    the pseudo code is in the comments of the function
-  Well-documented
-    there is pseudo code and documenation in the comments below as well as instructions
-  Code works
-    the code was run for all the examples and works like a charm
-  Learning parameters: inputs, targets, nodeLayers, learning rate, epochs, batchSize
-    all of the learning params were include, although eta represents learning rate
-  Termination conditions: max epochs, correct classification
-    if all the correct classificaitions are reached the function stops otherwise all epochs are done
-  Mini-batch SGD
-    this is performed
-  Outputs as requested (iris, MNIST, and XOR)
-    incldued in the word document
-  Incomplete
-    NA
-  Not sure
-    %NA
+  Momentum
+
+  L2 Regularizaion
+
+  Better Initial Weights
+
+  Functions: Tanh, Softmax, reLu
+
+  Mini Batch Suffling: At the beggining of the epochs, shuffle the mini
+  batches in the training
+
+  Adaptive Learning Rate: 
+
+  Return the learned network
+
+
+
   
   inputs: a matrix with a column for each example, and a row for each input feature
   targets: a matrix with a column for each example, and a row for each output feature
@@ -106,16 +130,16 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   %begin to subset inputs into mini batches based on the batchSize paramaters
   %if the remaining data is smaller then the batch size, return the remaining data as
   %the last batch
-  for start_pos = 1 : batchSize : length(inputs)
-      if length(inputs) - start_pos < batchSize
-          mb = inputs(:, start_pos:end);
+  for start_pos = 1 : batchSize : length(input_train)
+      if length(input_train) - start_pos < batchSize
+          mb = input_train(:, start_pos:end);
           batches{counter} = mb;
-          target = targets(:, start_pos:end);
+          target = target_train(:, start_pos:end);
           target_batches{counter} = target;
       else
-          mb = inputs(:, start_pos: start_pos + batchSize - 1);
+          mb = input_train(:, start_pos: start_pos + batchSize - 1);
           batches{counter} = mb;
-          target = targets(:, start_pos: start_pos + batchSize - 1);
+          target = target_train(:, start_pos: start_pos + batchSize - 1);
           target_batches{counter} = target;
           counter = counter + 1;
       end %end the if else
@@ -171,37 +195,101 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
       %after performing stochastic gradient descent using all mini batches an epoch is complete
       %the updated weights and biases are used to calculate the predicted (acitvaiton L) value on all the data
       final_activations = {};
-      final_activations{1} = inputs;
+      final_activations{1} = input_train;
       for layer = 2 : length(nodeLayers)
           z = bsxfun(@plus,(weights{layer} * final_activations{layer - 1}), bias{layer});
           a = logsig(z);
           final_activations{layer} = a;
       end
-
+      
+      %run model through the validation set
+      final_activations_val = {};
+      final_activations_val{1} = input_val;
+      for layer = 2 : length(nodeLayers)
+          z = bsxfun(@plus,(weights{layer} * final_activations_val{layer - 1}), bias{layer});
+          a = logsig(z);
+          final_activations_val{layer} = a;
+      end
+      
+      %run model through the test data
+      final_activations_test = {};
+      final_activations_test{1} = input_test;
+      for layer = 2 : length(nodeLayers)
+          z = bsxfun(@plus,(weights{layer} * final_activations_test{layer - 1}), bias{layer});
+          a = logsig(z);
+          final_activations_test{layer} = a;
+      end
+      
+    
       %the predicted class is to be the max value of the column vectors which represent an observations
       %the predictions are taken against the real values and the correct cases are found
-      if size(targets,1) > 1
-          [it,vt] = max(targets);
+      if size(target_train,1) > 1
+          [it,vt] = max(target_train);
           [i,v] = max(final_activations{length(nodeLayers)});
           confusion_array = vt - v;
           correct = sum(confusion_array(:)==0);
-          accuracy = correct/length(inputs);
-
+          accuracy = correct/length(input_train);
+          
+      %validation set
+      if size(target_train,1) > 1
+          [it,vt] = max(target_val);
+          [i,v] = max(final_activations_val{length(nodeLayers)});
+          confusion_array = vt - v;
+          correct_val = sum(confusion_array(:)==0);
+          accuracy_val = correct_val/length(input_val);
+          
+      %test set
+      if size(target_train,1) > 1
+          [it,vt] = max(target_test);
+          [i,v] = max(final_activations_test{length(nodeLayers)});
+          confusion_array = vt - v;
+          correct_test = sum(confusion_array(:)==0);
+          accuracy_test = correct_test/length(input_test);
+          
       %for binary classificaiton, we just round the value to a 0 or 1 thus providing the predicted
       %value of each case
       else
-          confusion_array = targets - round(final_activations{length(nodeLayers)});
+          confusion_array = target_train - round(final_activations{length(nodeLayers)});
           correct = sum(confusion_array(:)==0);
-          accuracy = correct/length(inputs);
+          accuracy = correct/length(input_train);
+      end
+      
+      %val
+      else
+          confusion_array = target_val - round(final_activations_val{length(nodeLayers)});
+          correct_val = sum(confusion_array(:)==0);
+          accuracy_val = correct_val/length(input_val);
+      end
+
+      %test
+      else
+          confusion_array = target_test - round(final_activations_test{length(nodeLayers)});
+          correct_test = sum(confusion_array(:)==0);
+          accuracy_test = correct/length(input_test);
       end
 
       %calculate the mse by using 1/2||y - yhat||^2 element wise then divided by 2n (provided in the book)
-      mse = 1/(2*(length(inputs))) * sum(sum((.5 * (targets - final_activations{length(nodeLayers)}).^2)));
-      fprintf('Epoch: %d MSE: %f5 Correct: %d/%d Accuracy: %f \n', epoch, mse, correct, length(inputs), accuracy);
-
+      mse = 1/(2*(length(input_train))) * sum(sum((.5 * (target_train - final_activations{length(nodeLayers)}).^2)));
+      mse_val = 1/(2*(length(input_val))) * sum(sum((.5 * (target_val - final_activations_val{length(nodeLayers)}).^2)));
+      mse_test = 1/(2*(length(input_test))) * sum(sum((.5 * (target_test - final_activations_test{length(nodeLayers)}).^2)));
+      fprintf('Epoch: %d MSE Train: %f5 Correct Train: %d/%d Accuracy Train: %f \n', epoch, mse, correct, length(input_train), accuracy);
+      fprintf('Epoch: %d MSE Train: %f5 Correct Train: %d/%d Accuracy Train: %f \n', epoch, mse_val, correct_val, length(input_val), accuracy_val);
+      fprintf('Epoch: %d MSE Train: %f5 Correct Train: %d/%d Accuracy Train: %f \n', epoch, mse_test, correct_test, length(input_test), accuracy_test);
+      disp(' ')
+      
+      %append values to the arrays that store accuracies after epochs
+      epoch_array(epoch) = [epoch];
+      mse_train_array(epoch) = [mse];
+      mse_val_array(epoch) = [mse_val];
+      mse_test_array(epoch) = [mse_test];
+      
+      accuracy_train_array(epoch) = [accuracy];
+      accuracy_val_array(epoch) = [accuracy_val];
+      accuracy_test_array(epoch) = [accuracy_test];
+      
       %after each epoch, if our correct cases is equal to our total cases then all cases
       %are correctly predicted and the function terminates otherwise a new epoch is started
-      if correct == length(inputs)
+      if correct == length(input_train)
 
           y = 'All cases were classified correctly';
 
