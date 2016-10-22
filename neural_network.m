@@ -1,20 +1,7 @@
 %Brian Craft | craft1.brian@gmail.com
 %neural network csc578 project 2
 
-function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation, l2, activation_function, cost_function, momentum, softmax_ind)
-
-  %Checklist
-    %training,validation,test
-    %calculate cost and accuracy for test, validation and training and store the results for ploting
-    %better weight initialization
-    %tanh, ReLU, softmax
-    %early stopping
-    %adaptive learning rate
-    %mini batch shuffling
-    %l2 regularization
-    %momentum
-    %quadratic cost, cross entropy
-
+function [epoch_array, mse_train_array, mse_val_array, mse_test_array, accuracy_array, accuracy_val_array, accuracy_test_array, weights, bias] = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation, l2, activation_function, cost_function, momentum, softmax_ind)
 
   %test_validation = [80,10,10] or array of the sizes of the training, validation and test datasets (percentage)
   %actiavtion_functions = ['tanh', 'sigmoid', 'relu'] relu is default
