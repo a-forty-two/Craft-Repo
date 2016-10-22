@@ -1,13 +1,13 @@
 %Brian Craft | craft1.brian@gmail.com
 %neural network csc578 project 2
 
-function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation, l2, activation_function, cost_function, momentum)
+function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation, l2, activation_function, cost_function, momentum, softmax_ind)
 
   %Checklist
     %training,validation,test
     %calculate cost and accuracy for test, validation and training and store the results for ploting
     %better weight initialization
-    %tanh, ReLU
+    %tanh, ReLU, softmax
     %early stopping
     %adaptive learning rate
     %mini batch shuffling
@@ -15,9 +15,11 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
     %momentum
     %quadratic cost, cross entropy
 
+
   %test_validation = [80,10,10] or array of the sizes of the training, validation and test datasets (percentage)
   %actiavtion_functions = ['tanh', 'sigmoid', 'relu'] relu is default
   %cost_function = ['quadratic_cost', 'cross_entropy', 'log_like']
+  %softmax = boolean
 
   %create the training, test and validation
   [train_ind,val_ind,test_ind] = dividerand(length(inputs),test_validation(1),test_validation(2),test_validation(3));
@@ -40,7 +42,6 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   
   %{
   %Log Likelinhood
-  Softmax
   Return the learned network
   %}
 
@@ -111,15 +112,21 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
               
               intermediate_z{layer} = bsxfun(@plus,(weights{layer} * activation{layer - 1}), bias{layer});
               
+              %apply softmax
+              if softmax_ind == 1 && layer == length(nodeLayers)
+                    activation{layer} = softmax(intermediate_z{layer});
+              end
+
               %activation functions
               %based on what the user inputs, the activation function is applied
               if strcmp(activation_function, 'tanh') == 1
                   activation{layer} = tanh(intermediate_z{layer});
               elseif strcmp(activation_function, 'sigmoid') == 1
-                  activation{layer} = logsig(intermediate_z{layer}); 
+                  activation{layer} = logsig(intermediate_z{layer});
               else
                   activation{layer} = poslin(intermediate_z{layer}); 
               end
+
              
           end
               
@@ -269,9 +276,9 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
                cost_val = sum(crossentropy(target_val, final_activations_val{length(nodeLayers)})) + l2_factor_val;
                cost_test = sum(crossentropy(target_test, final_activations_test{length(nodeLayers)}));
       else
-              cost = sum(sum(-log(final_activations{length(nodeLayers)}))) + l2_factor_train;
-              cost_val = sum(sum(-log(final_activations_val{length(nodeLayers)}))) + l2_factor_val;
-              cost_test = sum(sum(-log(final_activations_test{length(nodeLayers)}))) + l2_factor_test;
+              cost = sum(sum(-log((target_train - final_activations{length(nodeLayers)})))) + l2_factor_train;
+              cost_val = sum(sum(-log((target_val - final_activations_val{length(nodeLayers)})))) + l2_factor_val;
+              cost_test = sum(sum(-log((target_test - final_activations_test{length(nodeLayers)})))) + l2_factor_test;
       end
       
       %print the header if we are on the first epoch
@@ -326,6 +333,6 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
 
   end %end epoch loop if needed
 
-  y = 'End of Epochs';
+  y = 'Epochs reached';
 
 end %end function
