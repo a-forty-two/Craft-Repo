@@ -1,7 +1,7 @@
 %Brian Craft | craft1.brian@gmail.com
 %neural network csc578 project 1
 
-function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation, l2, activation_function, cost_function)
+function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation, l2, activation_function, cost_function, momentum)
 
   %Checklist
     %training,validation,test
@@ -12,6 +12,8 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
     %adaptive learning rate
     %mini batch shuffling
     %l2 regularization
+    %momentum
+    %quadratic cost, cross entropy
 
   %test_validation = [80,10,10] or array of the sizes of the training, validation and test datasets (percentage)
   %actiavtion_functions = ['tanh', 'sigmoid', 'relu'] relu is default
@@ -35,22 +37,17 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   accuracy_val_array = [];
   accuracy_test_array = [];
   
-  %  Cost: Quadratic, Cross Entropy, Log Likelinhood
-  
   %{
-  Early Stopping: When error/cost on the validation/test increases after
-  some number of epochs
-
-  Momentum
-
+  %Log Likelinhood
   Softmax
-
   Return the learned network
   %}
 
   %create a cell array that will store the weights and bias
   weights = {};
+  weights_upate = {};
   bias = {};
+  bias_update = {};
     
   %counters used to make the weights and bias matrices
   to_layer = 2;
@@ -151,10 +148,34 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
 
           %update weights and biases
           for layer = length(nodeLayers) : -1 : 2
-              w = weights{layer} - eta/length(batches{random(counter_batches)}) * delta{layer} * activation{layer - 1}.';
-              weights{layer} = w;
-              b = bias{layer} - eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2);
-              bias{layer} = b;
+
+              %no momentum used on the first epoch
+              if epoch == 1 & batch == 1
+                w = weights{layer} - eta/length(batches{random(counter_batches)}) * delta{layer} * activation{layer - 1}.';
+                weights{layer} = w;
+                b = bias{layer} - eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2);
+                bias{layer} = b;
+
+                %add in the weight updates
+                update_weights = eta/length(batches{random(counter_batches)}) * delta{layer} * activation{layer - 1}.'
+                update_biases = eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2);
+                weights_upate{layer} = update_weights;
+                bias_update{layer} = update_biases;
+
+              %if we are on a subsequent epoch, we will begin using momentum
+              else
+                w = weights{layer} - (eta/length(batches{random(counter_batches)}) * delta{layer} * activation{layer - 1}.') + momentum * weights_upate{layer};
+                weights{layer} = w;
+                b = bias{layer} - eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2) + momentum * bias_update{layer};
+                bias{layer} = b;
+
+                %reset the weight update
+                update_weights = (eta/length(batches{random(counter_batches)}) * delta{layer} * activation{layer - 1}.');
+                update_biases = eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2);
+                weights_upate{layer} = update_weights;
+                bias_update{layer} = update_biases;
+              end
+
           end
 
       counter_batches = counter_batches + 1;
@@ -311,4 +332,3 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   y = 'End of Epochs';
 
 end %end function
-
