@@ -41,11 +41,10 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   accuracy_test_array = [];
   
   %{
-  %Log Likelinhood
   Return the learned network
   %}
 
-  %create a cell array that will store the weights and bias
+  %create a cell array that will store the weights and bias and update values to be used for momentum
   weights = {};
   weights_upate = {};
   bias = {};
@@ -55,7 +54,6 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   to_layer = 2;
   from_layer = 1;
 
-  %better weight and bias initialization
   %initialize weights and bias using a stanard deivation of 1/sqrt(N)
   for layer = 2 : length(nodeLayers)
       weights{to_layer} = normrnd(0,1/sqrt(length(input_train)),nodeLayers(to_layer), nodeLayers(from_layer));
@@ -85,16 +83,14 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
           target_batches{counter} = target;
           counter = counter + 1;
           
-      end %end the if else
+      end
       
-  end %end the input loop
+  end
 
-  %begin running an epoch until the max number of epochs is reached or all cases are correctly classified
+  %begin epoch
   for epoch = 1 : numEpochs
       
       %shuffle the mini batches
-      %a random order of indicies is generated from 1 to the number of batches
-      %this index order is then used to loop through the mini batches
       random = randperm(length(batches));
       counter_batches = 1;
       
@@ -112,54 +108,56 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
               
               intermediate_z{layer} = bsxfun(@plus,(weights{layer} * activation{layer - 1}), bias{layer});
               
-              %apply softmax
+              %apply softmax to the output layer only if boolean is 1
               if softmax_ind == 1 && layer == length(nodeLayers)
                     activation{layer} = softmax(intermediate_z{layer});
               end
-
-              %activation functions
-              %based on what the user inputs, the activation function is applied
+              
+              %tanh activation function
               if strcmp(activation_function, 'tanh') == 1
                   activation{layer} = tanh(intermediate_z{layer});
+              %sigmoid activaiton function
               elseif strcmp(activation_function, 'sigmoid') == 1
                   activation{layer} = logsig(intermediate_z{layer});
+              %relu activaiton function
               else
-                  activation{layer} = poslin(intermediate_z{layer}); 
+                  activation{layer} = poslin(intermediate_z{layer});
               end
 
              
           end
               
-          %calculate the error                   
-          err = (activation{length(nodeLayers)} - target_batches{random(counter_batches)});
-          
-          %based on user input, the derivative of the activation function is applied
-          if strcmp(activation_function, 'tanh') == 1
-              sigprime = 1 - power(tanh((intermediate_z{length(nodeLayers)})),2 );
-          elseif strcmp(activation_function, 'sigmoid') == 1
-              sigprime = logsig(intermediate_z{length(nodeLayers)}) .* (1 - logsig(intermediate_z{length(nodeLayers)})); 
-          else
-              sigprime = poslin(intermediate_z{length(nodeLayers)});
-          end
-          
-          delta{length(nodeLayers)} = err .* sigprime;
+          %calculate error of the last layer               
+          delta{length(nodeLayers)} = (activation{length(nodeLayers)} - target_batches{random(counter_batches)});
 
-          %begin backpropogating the error for L - 1, L -2 .... 2
+          %backpropogation
           for layer = (length(nodeLayers) - 1) : -1 : 2
-              delta{layer} = (weights{layer + 1}.' * delta{layer + 1}) .* (logsig(intermediate_z{layer}) .* (1 - logsig(intermediate_z{layer})));
+              
+              if strcmp(activation_function, 'tanh') == 1
+                    sigprime = 1 - power(tanh((intermediate_z{layer})),2 );
+                    delta{layer} = (weights{layer + 1}.' * delta{layer + 1}) .* sigprime;
+              elseif strcmp(activation_function, 'sigmoid') == 1
+                    sigprime = (logsig(intermediate_z{layer})) .* (1 - logsig(intermediate_z{layer}));
+                    delta{layer} = (weights{layer + 1}.' * delta{layer + 1}) .*  sigprime;
+              else
+                  sigprime = poslin(intermediate_z{layer});
+                  delta{layer} = (weights{layer + 1}.' * delta{layer + 1}) .*  sigprime;
+                  
+              end 
+
           end
 
           %update weights and biases
           for layer = length(nodeLayers) : -1 : 2
 
-              %no momentum used on the first epoch
+              %no momentum used in the first epoch/batch since there is no change in the weights yet
               if epoch == 1 & batch == 1
                 w = weights{layer} - eta/length(batches{random(counter_batches)}) * delta{layer} * activation{layer - 1}.';
                 weights{layer} = w;
                 b = bias{layer} - eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2);
                 bias{layer} = b;
 
-                %add in the weight updates
+                %add in the weight updates for momentum
                 update_weights = eta/length(batches{random(counter_batches)}) * delta{layer} * activation{layer - 1}.'
                 update_biases = eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2);
                 weights_upate{layer} = update_weights;
@@ -172,7 +170,7 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
                 b = bias{layer} - eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2) + momentum * bias_update{layer};
                 bias{layer} = b;
 
-                %reset the weight update
+                %reset the weight update to be used for momentum
                 update_weights = (eta/length(batches{random(counter_batches)}) * delta{layer} * activation{layer - 1}.');
                 update_biases = eta/length(batches{random(counter_batches)}) * sum(delta{layer}, 2);
                 weights_upate{layer} = update_weights;
@@ -198,7 +196,14 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
           z = bsxfun(@plus,(weights{layer} * final_activations{layer - 1}), bias{layer});
           z_val = bsxfun(@plus,(weights{layer} * final_activations_val{layer - 1}), bias{layer});
           z_test = bsxfun(@plus,(weights{layer} * final_activations_test{layer - 1}), bias{layer});
-          
+
+          %apply softmax to the output layer only if boolean is 1
+          if softmax_ind == 1 && layer == length(nodeLayers)
+              final_activation{layer} = softmax(z);
+              final_activation_val{layer} = softmax(z_val);
+              final_activation_test{layer} = softmax(z_test);
+          end
+  
           if strcmp(activation_function, 'tanh') == 1
              final_activations{layer} = tanh(z);
              final_activations_val{layer} = tanh(z_val);  
@@ -217,18 +222,21 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
       
       %class matrix
       if size(target_train,1) > 1
+
           %training
           [it,vt] = max(target_train);
           [i,v] = max(final_activations{length(nodeLayers)});
           confusion_array = vt - v;
           correct = sum(confusion_array(:)==0);
           accuracy = correct/length(input_train);
+
           %validation
           [it_val,vt_val] = max(target_val);
           [i_val,v_val] = max(final_activations_val{length(nodeLayers)});
           confusion_array_val = vt_val - v_val;
           correct_val = sum(confusion_array_val(:)==0);
           accuracy_val = correct_val/length(input_val);
+
           %testing
           [it_test,vt_test] = max(target_test);
           [i_test,v_test] = max(final_activations_test{length(nodeLayers)});
@@ -238,47 +246,50 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
           
       %binary classification
       else
+
           %training
           confusion_array = target_train - round(final_activations{length(nodeLayers)});
           correct = sum(confusion_array(:)==0);
           accuracy = correct/length(input_train);
+
           %validation
           confusion_array_val = target_val - round(final_activations_val{length(nodeLayers)});
           correct_val = sum(confusion_array_val(:)==0);
           accuracy_val = correct_val/length(input_val);
+
           %testing
           confusion_array_test = target_test - round(final_activations_test{length(nodeLayers)});
           correct_test = sum(confusion_array_test(:)==0);
           accuracy_test = correct/length(input_test);
       end
 
-      %l2
-      %calculate the sum of weights squared
+      %calculate the sum of weights squared for L2
       sum_weights = 0;
       for w_counter = 2 : length(weights)
           w_sq = weights{w_counter}.^2;
           sum_count = sum(sum(w_sq));
           sum_weights = sum_weights + sum_count;
       end
-           
-      %final regularization factors 
+
       l2_factor_train =  l2/(2*length(input_train)) * sum_weights;
       l2_factor_val =  l2/(2*length(input_val)) * sum_weights;
       l2_factor_test =  l2/(2*length(input_test)) * sum_weights;
        
-      %calculate cost using either quadratic cost, cross entropy
+      %calculate cost using quadratic_cost
       if strcmp(cost_function, 'quadratic_cost') == 1
-              cost = (1/(2*(length(input_train))) * sum(sum((.5 * (target_train - final_activations{length(nodeLayers)}).^2)))) + l2_factor_train;
-              cost_val = (1/(2*(length(input_val))) * sum(sum((.5 * (target_val - final_activations_val{length(nodeLayers)}).^2)))) + l2_factor_val;
-              cost_test = (1/(2*(length(input_test))) * sum(sum((.5 * (target_test - final_activations_test{length(nodeLayers)}).^2)))) + l2_factor_test;            
+          cost = (1/(2*(length(input_train))) * sum(sum((.5 * (target_train - final_activations{length(nodeLayers)}).^2)))) + l2_factor_train;
+          cost_val = (1/(2*(length(input_val))) * sum(sum((.5 * (target_val - final_activations_val{length(nodeLayers)}).^2)))) + l2_factor_val;
+          cost_test = (1/(2*(length(input_test))) * sum(sum((.5 * (target_test - final_activations_test{length(nodeLayers)}).^2)))) + l2_factor_test;            
+      %calculate cost using cross_entropy
       elseif strcmp(cost_function, 'cross_entropy') == 1
-               cost = sum(crossentropy(target_train, final_activations{length(nodeLayers)})) + l2_factor_train;
-               cost_val = sum(crossentropy(target_val, final_activations_val{length(nodeLayers)})) + l2_factor_val;
-               cost_test = sum(crossentropy(target_test, final_activations_test{length(nodeLayers)}));
+          cost = sum(crossentropy(target_train, final_activations{length(nodeLayers)})) + l2_factor_train;
+          cost_val = sum(crossentropy(target_val, final_activations_val{length(nodeLayers)})) + l2_factor_val;
+          cost_test = sum(crossentropy(target_test, final_activations_test{length(nodeLayers)}));
+      %calculate cost using log likelihood (small epsilon of .01 is used to account for a case of -ln(0) == inf)
       else
-              cost = sum(sum(-log((target_train - final_activations{length(nodeLayers)})))) + l2_factor_train;
-              cost_val = sum(sum(-log((target_val - final_activations_val{length(nodeLayers)})))) + l2_factor_val;
-              cost_test = sum(sum(-log((target_test - final_activations_test{length(nodeLayers)})))) + l2_factor_test;
+          cost = sum(sum(-log((target_train - final_activations{length(nodeLayers)} + .01)))) + l2_factor_train;
+          cost_val = sum(sum(-log((target_val - final_activations_val{length(nodeLayers)} + .01)))) + l2_factor_val;
+          cost_test = sum(sum(-log((target_test - final_activations_test{length(nodeLayers)} + .01)))) + l2_factor_test;
       end
       
       %print the header if we are on the first epoch
@@ -310,15 +321,16 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
       else
           counter_termiante = 0;
       
-      %early stopping criteria check
       %termiante if all cases are classified correctly
       if correct == length(input_train)
           y = 'All cases were classified correctly';
           return;
-      %if the cost has gone up for more then 5 epochs in a row, the function will terminate
-      elseif counter_terminate > 5
+
+      %if the cost has gone up for more then 10 epochs in a row, the function will terminate
+      elseif counter_terminate > 10
           y = 'Validation cost is increasing';
           return;
+
       %continue if there is no early stopping criteria met
       else
           continue
