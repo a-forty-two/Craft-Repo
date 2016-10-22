@@ -4,22 +4,15 @@
 function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation, l2, activation_function, cost_function)
 
   %Checklist
-    %training,validation,test
-    %calculate cost and accuracy for test, validation and training and store the results for ploting
-    %better weight initialization
-    %tanh, ReLU
-    %early stopping
-    %adaptive learning rate
-    %mini batch shuffling
-
-  %test_validation = [80,10,10] or array of the sizes of the training, validation and test datasets (percentage)
-  %actiavtion_functions = ['tanh', 'sigmoid', 'relu'] relu is default
-
-  %create the training, test and validation
+  %y = neural_network(nodeLayer, iris_x.', iris_y.', batchSize, epochs, eta, test_validation, l2, cost_function)
+  
+  %split inputs
   [train_ind,val_ind,test_ind] = dividerand(length(inputs),test_validation(1),test_validation(2),test_validation(3));
   input_train = inputs(:,train_ind);
   input_val = inputs(:,val_ind);
   input_test = inputs(:,test_ind);
+  
+  %pass the indicies to the targets as well
   target_train = targets(:,train_ind);
   target_val = targets(:,val_ind);
   target_test = targets(:,test_ind);
@@ -34,6 +27,10 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   accuracy_val_array = [];
   accuracy_test_array = [];
   
+  %Better Initial Weight
+  %Functions: Tanh, reLu
+  %mini batch shuffling at the beginning of each epoch
+  %adaptive learning rate
   %  Cost: Quadratic, Cross Entropy, Log Likelinhood
   
   %{
@@ -55,8 +52,7 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   to_layer = 2;
   from_layer = 1;
 
-  %better weight and bias initialization
-  %initialize weights and bias using a stanard deivation of 1/sqrt(N)
+  %initialize weights and bias
   for layer = 2 : length(nodeLayers)
       weights{to_layer} = normrnd(0,1/sqrt(length(input_train)),nodeLayers(to_layer), nodeLayers(from_layer));
       bias{to_layer} = normrnd(0,1/sqrt(length(input_train)),nodeLayers(to_layer), 1);
@@ -92,12 +88,11 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   %begin running an epoch until the max number of epochs is reached or all cases are correctly classified
   for epoch = 1 : numEpochs
       
-      %shuffle the mini batches
-      %a random order of indicies is generated from 1 to the number of batches
-      %this index order is then used to loop through the mini batches
+      %shuffle each mini batch
       random = randperm(length(batches));
       counter_batches = 1;
       
+
       %begin looping through each mini batch
       for batch = 1 : length(batches) 
 
@@ -112,8 +107,6 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
               
               intermediate_z{layer} = bsxfun(@plus,(weights{layer} * activation{layer - 1}), bias{layer});
               
-              %activation functions
-              %based on what the user inputs, the activation function is applied
               if strcmp(activation_function, 'tanh') == 1
                   activation{layer} = tanh(intermediate_z{layer});
 
@@ -130,7 +123,6 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
           %calculate the error                   
           err = (activation{length(nodeLayers)} - target_batches{random(counter_batches)});
           
-          %based on user input, the derivative of the activation function is applied
           if strcmp(activation_function, 'tanh') == 1
               sigprime = 1 - power(tanh((intermediate_z{length(nodeLayers)})),2 );
 
@@ -281,36 +273,23 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
       accuracy_val_array(epoch) = [accuracy_val];
       accuracy_test_array(epoch) = [accuracy_test];
       
-      %if the cost on the val set increases after an epoch, then the counter increments, otherwise it resets to 0
-      if length(mse_val_array) > 1 & mse_val_array(end) > mse_val_array(end-1)
-          counter_terminate = counter_terminate + 1;
-      else
-          counter_termiante = 0;
-      
-      %early stopping criteria check
-      %termiante if all cases are classified correctly
+      %return the value of y
       if correct == length(input_train)
           y = 'All cases were classified correctly';
           return;
-      %if the cost has gone up for more then 5 epochs in a row, the function will terminate
-      elseif counter_terminate > 5
-          y = 'Validation cost is increasing';
-          return;
-      %continue if there is no early stopping criteria met
-      else
-          continue
       end
-         
-      %adaptive learning rate
-      %if it's after 100 epochs and the mse increased the learning rate will be divide by 10
-      %the learning rate cannot get lower then .0001
+      
+      
+      %adaptive learning rate after 100 epochs if the mse on the validation
+      %starts to do worse then decrease the learning rate by a factor of 10
+      %learning rate can also not go lower then .0001
       if length(mse_val_array) > 100 && mse_val_array(end) > mse_val_array(end-1) && eta > .0001
           eta = eta * .1;
       end
 
   end %end epoch loop if needed
 
-  y = 'End of Epochs';
+  y = 'End of Epochs'
 
 end %end function
 
