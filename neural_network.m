@@ -11,6 +11,7 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
     %early stopping
     %adaptive learning rate
     %mini batch shuffling
+    %l2 regularization
 
   %test_validation = [80,10,10] or array of the sizes of the training, validation and test datasets (percentage)
   %actiavtion_functions = ['tanh', 'sigmoid', 'relu'] relu is default
@@ -227,20 +228,18 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
           accuracy_test = correct/length(input_test);
       end
 
-      %calculate the regularization factor
+      %l2
+      %calculate the regularization factor l2/2N * sum(w^2)
       sum_weights = 0;
-      for w_counter = 1 : length(weights)
-          w = weights{w_counter};
-          sum_count = sum(sum(w));
+      for w_counter = 2 : length(weights)
+          w_sq = weights{w_counter}.^2;
+          sum_count = sum(sum(w_sq));
           sum_weights = sum_weights + sum_count;
       end
-      
-      sum_w_squared = sum_weights^2;
-      
-      l2_factor_train =  l2/(2*length(input_train));
-      l2_factor_val =  l2/(2*length(input_val));
-      l2_factor_test =  l2/(2*length(input_test));
-       
+            
+      l2_factor_train =  l2/(2*length(input_train)) * sum_weights;
+      l2_factor_val =  l2/(2*length(input_val)) * sum_weights;
+      l2_factor_test =  l2/(2*length(input_test)) * sum_weights;
        
       %calculate the mse by using 1/2||y - yhat||^2 element wise then divided by 2n (provided in the book)
       if strcmp(cost_function, 'quadratic_cost') == 1
@@ -249,17 +248,16 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
               cost_test = (1/(2*(length(input_test))) * sum(sum((.5 * (target_test - final_activations_test{length(nodeLayers)}).^2)))) + l2_factor_test;
               
       elseif strcmp(cost_function, 'cross_entropy') == 1
-               cost = sum(crossentropy(target_train, final_activations{length(nodeLayers)}));
-               cost_val = sum(crossentropy(target_val, final_activations_val{length(nodeLayers)}));
+               cost = sum(crossentropy(target_train, final_activations{length(nodeLayers)})) + l2_factor_train;
+               cost_val = sum(crossentropy(target_val, final_activations_val{length(nodeLayers)})) + l2_factor_val;
                cost_test = sum(crossentropy(target_test, final_activations_test{length(nodeLayers)}));
       else
-              cost = sum(sum(-log(final_activations{length(nodeLayers)})));
-              cost_val = sum(sum(-log(final_activations_val{length(nodeLayers)})));
-              cost_test = sum(sum(-log(final_activations_test{length(nodeLayers)})));
+              cost = sum(sum(-log(final_activations{length(nodeLayers)}))) + l2_factor_train;
+              cost_val = sum(sum(-log(final_activations_val{length(nodeLayers)}))) + l2_factor_val;
+              cost_test = sum(sum(-log(final_activations_test{length(nodeLayers)}))) + l2_factor_test;
       end
       
-              
-      
+      %print the header if we are on the first epoch
       if epoch == 1
           disp(' ')
           fprintf('      |                      Train                          ||                         Test                      ||                     Validation               \n');
@@ -282,7 +280,7 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
       accuracy_test_array(epoch) = [accuracy_test];
       
       %if the cost on the val set increases after an epoch, then the counter increments, otherwise it resets to 0
-      if length(mse_val_array) > 1 & mse_val_array(end) > mse_val_array(end-1)
+      if length(mse_val_array) > 1 & .1 * mse_val_array(end) > mse_val_array(end) - mse_val_array(end-1)
           counter_terminate = counter_terminate + 1;
       else
           counter_termiante = 0;
@@ -313,5 +311,4 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
   y = 'End of Epochs';
 
 end %end function
-
 
