@@ -1,5 +1,5 @@
 %Brian Craft | craft1.brian@gmail.com
-%neural network csc578 project 1
+%neural network csc578 project 2
 
 function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, eta, test_validation, l2, activation_function, cost_function, momentum)
 
@@ -17,6 +17,7 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
 
   %test_validation = [80,10,10] or array of the sizes of the training, validation and test datasets (percentage)
   %actiavtion_functions = ['tanh', 'sigmoid', 'relu'] relu is default
+  %cost_function = ['quadratic_cost', 'cross_entropy', 'log_like']
 
   %create the training, test and validation
   [train_ind,val_ind,test_ind] = dividerand(length(inputs),test_validation(1),test_validation(2),test_validation(3));
@@ -114,13 +115,10 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
               %based on what the user inputs, the activation function is applied
               if strcmp(activation_function, 'tanh') == 1
                   activation{layer} = tanh(intermediate_z{layer});
-
               elseif strcmp(activation_function, 'sigmoid') == 1
                   activation{layer} = logsig(intermediate_z{layer}); 
-
               else
                   activation{layer} = poslin(intermediate_z{layer}); 
-
               end
              
           end
@@ -131,10 +129,8 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
           %based on user input, the derivative of the activation function is applied
           if strcmp(activation_function, 'tanh') == 1
               sigprime = 1 - power(tanh((intermediate_z{length(nodeLayers)})),2 );
-
           elseif strcmp(activation_function, 'sigmoid') == 1
               sigprime = logsig(intermediate_z{length(nodeLayers)}) .* (1 - logsig(intermediate_z{length(nodeLayers)})); 
-
           else
               sigprime = poslin(intermediate_z{length(nodeLayers)});
           end
@@ -200,12 +196,10 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
              final_activations{layer} = tanh(z);
              final_activations_val{layer} = tanh(z_val);  
              final_activations_test{layer} = tanh(z_test);        
-
           elseif strcmp(activation_function, 'sigmoid') == 1
              final_activations{layer} = logsig(z);
              final_activations_val{layer} = logsig(z_val);  
              final_activations_test{layer} = logsig(z_test);  
-
           else
              final_activations{layer} = poslin(z);
              final_activations_val{layer} = poslin(z_val);  
@@ -216,18 +210,19 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
       
       %class matrix
       if size(target_train,1) > 1
+          %training
           [it,vt] = max(target_train);
           [i,v] = max(final_activations{length(nodeLayers)});
           confusion_array = vt - v;
           correct = sum(confusion_array(:)==0);
           accuracy = correct/length(input_train);
-
+          %validation
           [it_val,vt_val] = max(target_val);
           [i_val,v_val] = max(final_activations_val{length(nodeLayers)});
           confusion_array_val = vt_val - v_val;
           correct_val = sum(confusion_array_val(:)==0);
           accuracy_val = correct_val/length(input_val);
-
+          %testing
           [it_test,vt_test] = max(target_test);
           [i_test,v_test] = max(final_activations_test{length(nodeLayers)});
           confusion_array_test = vt_test - v_test;
@@ -236,38 +231,39 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
           
       %binary classification
       else
+          %training
           confusion_array = target_train - round(final_activations{length(nodeLayers)});
           correct = sum(confusion_array(:)==0);
           accuracy = correct/length(input_train);
-
+          %validation
           confusion_array_val = target_val - round(final_activations_val{length(nodeLayers)});
           correct_val = sum(confusion_array_val(:)==0);
           accuracy_val = correct_val/length(input_val);
-
+          %testing
           confusion_array_test = target_test - round(final_activations_test{length(nodeLayers)});
           correct_test = sum(confusion_array_test(:)==0);
           accuracy_test = correct/length(input_test);
       end
 
       %l2
-      %calculate the regularization factor l2/2N * sum(w^2)
+      %calculate the sum of weights squared
       sum_weights = 0;
       for w_counter = 2 : length(weights)
           w_sq = weights{w_counter}.^2;
           sum_count = sum(sum(w_sq));
           sum_weights = sum_weights + sum_count;
       end
-            
+           
+      %final regularization factors 
       l2_factor_train =  l2/(2*length(input_train)) * sum_weights;
       l2_factor_val =  l2/(2*length(input_val)) * sum_weights;
       l2_factor_test =  l2/(2*length(input_test)) * sum_weights;
        
-      %calculate the mse by using 1/2||y - yhat||^2 element wise then divided by 2n (provided in the book)
+      %calculate cost using either quadratic cost, cross entropy
       if strcmp(cost_function, 'quadratic_cost') == 1
               cost = (1/(2*(length(input_train))) * sum(sum((.5 * (target_train - final_activations{length(nodeLayers)}).^2)))) + l2_factor_train;
               cost_val = (1/(2*(length(input_val))) * sum(sum((.5 * (target_val - final_activations_val{length(nodeLayers)}).^2)))) + l2_factor_val;
-              cost_test = (1/(2*(length(input_test))) * sum(sum((.5 * (target_test - final_activations_test{length(nodeLayers)}).^2)))) + l2_factor_test;
-              
+              cost_test = (1/(2*(length(input_test))) * sum(sum((.5 * (target_test - final_activations_test{length(nodeLayers)}).^2)))) + l2_factor_test;            
       elseif strcmp(cost_function, 'cross_entropy') == 1
                cost = sum(crossentropy(target_train, final_activations{length(nodeLayers)})) + l2_factor_train;
                cost_val = sum(crossentropy(target_val, final_activations_val{length(nodeLayers)})) + l2_factor_val;
@@ -290,12 +286,13 @@ function y = neural_network(nodeLayers, inputs, targets, batchSize, numEpochs, e
       fprintf(' %d    | %f5  | %d/%d  |   %f   ||   %f5  |  %d/%d |  %f    ||  %f5  |  %d/%d  |  %f  \n', epoch, cost, correct, length(input_train), accuracy, cost_val, correct_val, length(input_val), accuracy_val, cost_test, correct_test, length(input_test), accuracy_test);
 
       
-      %append values to the arrays that store accuracies after epochs
+      %return cost to array for the training, validation and testing
       epoch_array(epoch) = [epoch];
       mse_train_array(epoch) = [cost];
       mse_val_array(epoch) = [cost_val];
       mse_test_array(epoch) = [cost_test];
       
+      %return accuracy to array for training, validation and testing
       accuracy_train_array(epoch) = [accuracy];
       accuracy_val_array(epoch) = [accuracy_val];
       accuracy_test_array(epoch) = [accuracy_test];
