@@ -256,18 +256,18 @@ function [epoch_array, mse_train_array, mse_val_array, mse_test_array, weights, 
       %calculate cost using quadratic_cost
       if strcmp(cost_function, 'quadratic_cost') == 1
           cost = (1/(2*(length(input_train))) * sum(sum((.5 * (target_train - final_activations{length(nodeLayers)}).^2)))) + l2_factor_train;
-          cost_val = (1/(2*(length(input_val))) * sum(sum((.5 * (target_val - final_activations_val{length(nodeLayers)}).^2)))) + l2_factor_train;
-          cost_test = (1/(2*(length(input_test))) * sum(sum((.5 * (target_test - final_activations_test{length(nodeLayers)}).^2)))) + l2_factor_train;            
+          cost_val = (1/(2*(length(input_val))) * sum(sum((.5 * (target_val - final_activations_val{length(nodeLayers)}).^2)))) + l2_factor_val;
+          cost_test = (1/(2*(length(input_test))) * sum(sum((.5 * (target_test - final_activations_test{length(nodeLayers)}).^2)))) + l2_factor_test;            
       %calculate cost using cross_entropy
       elseif strcmp(cost_function, 'cross_entropy') == 1
-          cost = sum(crossentropy(target_train, final_activations{length(nodeLayers)})) / length(input_train) + l2_factor_train;
-          cost_val = sum(crossentropy(target_val, final_activations_val{length(nodeLayers)})) / length(input_val) + l2_factor_train;
-          cost_test = sum(crossentropy(target_test, final_activations_test{length(nodeLayers)})) / length(input_test) + l2_factor_train;
+          cost = -1(sum(crossentropy(target_train, final_activations{length(nodeLayers)}))) + l2_factor_train;
+          cost_val = sum(crossentropy(target_val, final_activations_val{length(nodeLayers)})) + l2_factor_val;
+          cost_test = sum(crossentropy(target_test, final_activations_test{length(nodeLayers)}));
       %calculate cost using log likelihood (small epsilon of .01 is used to account for a case of -ln(0) == inf)
       else
-          cost = sum(sum(-log(max(final_activations{length(nodeLayers)}) + .00001))) + l2_factor_train;
-          cost_val = sum(sum(-log(max(final_activations_val{length(nodeLayers)}) + .00001))) + l2_factor_train;
-          cost_test = sum(sum(-log(max(final_activations_test{length(nodeLayers)}) + .00001))) + l2_factor_train;
+          cost = sum(sum(-log((final_activations{length(nodeLayers)}+.00001)))) + l2_factor_train;
+          cost_val = sum(sum(-log((final_activations_val{length(nodeLayers)} + .00001)))) + l2_factor_val;
+          cost_test = sum(sum(-log((final_activations_test{length(nodeLayers)} + .00001)))) + l2_factor_test;
       end
       
       %print the header if we are on the first epoch
