@@ -3,6 +3,31 @@ class neural_network:
     import random
     import numpy as np
 
+    # static methods for the transfer function and its prime
+    @staticmethod    
+    def transfer_function(z,fun):
+        if fun == 'sigmoid':
+            return 1.0/(1.0+np.exp(-z))
+        else:
+            return 1.0/(1.0+np.exp(-z))
+    
+    @staticmethod
+    def transfer_function_prime(z, fun):
+        if fun == 'sigmoid':
+            return np.multiply(neural_network.transfer_function(z, 'sigmoid'),\
+                               (1-neural_network.transfer_function(z, 'sigmoid')))
+        else:
+            return np.multiply(neural_network.transfer_function(z, 'sigmoid'),\
+                               (1-neural_network.transfer_function(z, 'sigmoid')))
+    
+    @staticmethod
+    def cost_function(y,a,fun):
+        
+        if fun == 'rmse':
+            return np.sum(y - a)
+        else:
+            return np.sum(y - a)
+        
     def __init__(self, layers, x, y):
         
         # network hyperparams
@@ -74,22 +99,24 @@ class neural_network:
                 self.activations[0] = x
             else:
                 z = np.dot(self.weights[i], self.activations[i-1])+self.bias[i]
-                a = sigmoid(z)
+                a = neural_network.transfer_function(z, fun = 'sigmoid')
                 self.activations[i] = a
                 self.intermediate_z[i] = z
+            
+            print 'Cost: ', neural_network.cost_function(self.activations[-1], y, 'rmse')
     
     # backpropogate our error
     def backprop(self):
 
         error = (self.activations[-1] - self.y)
-        sp = sigmoid_prime(self.intermediate_z[-1])
+        sp = neural_network.transfer_function(self.intermediate_z[-1], fun = 'sigmoid')
         delta = np.multiply(error,sp)
         self.delta[-1] = delta
         
         for i in range(2,self.size):
             l = i - 1
             z = self.intermediate_z[l]
-            sp = sigmoid_prime(z)
+            sp = neural_network.transfer_function_prime(z, fun = 'sigmoid')
             
             error = np.dot(self.weights[l+1].T, self.delta[l+1])
             delta = np.multiply(error,sp)
@@ -103,13 +130,3 @@ class neural_network:
             l = i
             gradient = np.dot(self.delta[l], self.activations[l-1].T)
             self.weights[l] = self.weights[l] - .1 * gradient
-            
-    @staticmethod    
-    def sigmoid(z):
-        """The sigmoid function."""
-        return 1.0/(1.0+np.exp(-z))
-    
-    @staticmethod
-    def sigmoid_prime(z):
-        """Derivative of the sigmoid function."""
-        return np.multiply(sigmoid(z),(1-sigmoid(z)))
