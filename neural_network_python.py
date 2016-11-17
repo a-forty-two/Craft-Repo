@@ -8,31 +8,39 @@ class neural_network:
     def transfer_function(z,fun):
         if fun == 'sigmoid':
             return 1.0/(1.0+np.exp(-z))
+        elif fun == 'relu':
+            return np.maximum(.0001, z)  
         else:
-            return 1.0/(1.0+np.exp(-z))
+            return np.maximum(.0001, z) 
     
     @staticmethod
     def transfer_function_prime(z, fun):
         if fun == 'sigmoid':
             return np.multiply(neural_network.transfer_function(z, 'sigmoid'),\
                                (1-neural_network.transfer_function(z, 'sigmoid')))
+        elif fun == 'relu':
+            return np.where(z<0, 0, 1)  
         else:
             return np.multiply(neural_network.transfer_function(z, 'sigmoid'),\
                                (1-neural_network.transfer_function(z, 'sigmoid')))
+        
     
     @staticmethod
     def cost_function(y,a,fun):
         
         if fun == 'rmse':
-            return np.sum(y - a)
+            return np.sum(y - a)**2
         else:
-            return np.sum(y - a)
+            return np.sum(y - a)**2
         
-    def __init__(self, layers, x, y):
+    def __init__(self, layers, x, y, eta, transfer_function, cost_function):
         
         # network hyperparams
         self.size = len(layers)
         self.layers = layers
+        self.eta = .1
+        self.transfer_function = transfer_function
+        self.cost_function = cost_function
         
         # data to train
         self.x = x
@@ -99,24 +107,25 @@ class neural_network:
                 self.activations[0] = x
             else:
                 z = np.dot(self.weights[i], self.activations[i-1])+self.bias[i]
-                a = neural_network.transfer_function(z, fun = 'sigmoid')
+                a = neural_network.transfer_function(z, self.transfer_function)
                 self.activations[i] = a
                 self.intermediate_z[i] = z
             
-            print 'Cost: ', neural_network.cost_function(self.activations[-1], y, 'rmse')
+            print 'Cost: ', neural_network.cost_function(self.activations[-1], y, \
+                                                         self.cost_function)
     
     # backpropogate our error
     def backprop(self):
 
         error = (self.activations[-1] - self.y)
-        sp = neural_network.transfer_function(self.intermediate_z[-1], fun = 'sigmoid')
+        sp = neural_network.transfer_function(self.intermediate_z[-1], self.transfer_function)
         delta = np.multiply(error,sp)
         self.delta[-1] = delta
         
         for i in range(2,self.size):
             l = i - 1
             z = self.intermediate_z[l]
-            sp = neural_network.transfer_function_prime(z, fun = 'sigmoid')
+            sp = neural_network.transfer_function_prime(z, self.transfer_function)
             
             error = np.dot(self.weights[l+1].T, self.delta[l+1])
             delta = np.multiply(error,sp)
@@ -129,4 +138,5 @@ class neural_network:
         for i in range(1,self.size):
             l = i
             gradient = np.dot(self.delta[l], self.activations[l-1].T)
-            self.weights[l] = self.weights[l] - .1 * gradient
+            self.weights[l] = self.weights[l] - self.eta * gradient
+            self.bias[l] = self.bias[l] - self.eta * np.mean(self.delta[l],1)
