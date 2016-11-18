@@ -1,7 +1,29 @@
+import numpy as np
+import math as math
+import pandas as pd
+
+# xor data
+x = np.matrix('0,1,0,1;1,1,0,0')
+y = np.matrix('0,1,0,1')
+layers = [2,5,1]
+
+# ames housing dataset
+train = pd.read_csv('train.csv')
+keep = ['LotArea', 'OverallQual', 'GarageCars', 'FullBath', 'GrLivArea', 'TotalBsmtSF', 'SalePrice']
+for i in train.columns:
+    if i in keep: pass
+    else: train = train.drop(i,1)
+for i in train.columns:
+    train[i] = (train[i] - train[i].min()) / (train[i].max() - train[i].min())
+y = np.matrix(train['SalePrice'])
+x = np.matrix(train.drop('SalePrice',1)).T
+layers = [6,3,1]
+
 class neural_network:
     
     import random
     import numpy as np
+    import pandas as pd
 
     # static methods for the transfer function and its prime
     @staticmethod    
@@ -33,7 +55,7 @@ class neural_network:
         else:
             return np.sum(y - a)**2
         
-    def __init__(self, layers, x, y, eta, transfer_function, cost_function):
+    def __init__(self, layers, x, y, eta, transfer_function, cost_function, epochs):
         
         # network hyperparams
         self.size = len(layers)
@@ -41,6 +63,7 @@ class neural_network:
         self.eta = .1
         self.transfer_function = transfer_function
         self.cost_function = cost_function
+        self.epochs = epochs
         
         # data to train
         self.x = x
@@ -110,9 +133,6 @@ class neural_network:
                 a = neural_network.transfer_function(z, self.transfer_function)
                 self.activations[i] = a
                 self.intermediate_z[i] = z
-            
-            print 'Cost: ', neural_network.cost_function(self.activations[-1], y, \
-                                                         self.cost_function)
     
     # backpropogate our error
     def backprop(self):
@@ -140,3 +160,21 @@ class neural_network:
             gradient = np.dot(self.delta[l], self.activations[l-1].T)
             self.weights[l] = self.weights[l] - self.eta * gradient
             self.bias[l] = self.bias[l] - self.eta * np.mean(self.delta[l],1)
+            
+    # function to run the model
+    def train_network(self):
+        for i in range(1,self.epochs):
+            self.feedforward()
+            self.backprop()
+            self.weight_bias_update()
+            
+            if i%1000 == 0:
+                yhat = pd.DataFrame(self.activations[-1].T)
+                yact = pd.DataFrame(self.y.T)
+                frames = [yhat,yact]
+                test = pd.concat(frames, axis = 1)
+                test.columns = ['yhat', 'y']
+
+                print 'Epoch: ', i, 'Cost: ', neural_network.cost_function(self.activations[-1], y, \
+                                                         self.cost_function), \
+                ' Correlation: ', np.corrcoef(test['yhat'], test['y'])[0,1]
