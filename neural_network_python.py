@@ -33,7 +33,10 @@ class neural_network:
         if fun == 'sigmoid':
             return 1.0/(1.0+np.exp(-z))
         elif fun == 'relu':
-            return np.maximum(.0001, z)  
+            return np.maximum(.0001, z)
+        elif fun == 'tanh':
+            return np.tanh(z)
+            #return (np.exp(z) - np.exp(-z)) / (np.exp(z) + np.exp(-z))
         else:
             return np.maximum(.0001, z) 
     
@@ -43,7 +46,10 @@ class neural_network:
             return np.multiply(neural_network.transfer_function(z, 'sigmoid'),\
                                (1-neural_network.transfer_function(z, 'sigmoid')))
         elif fun == 'relu':
-            return np.where(z<0, 0, 1)  
+            return np.where(z<0, .0001, 1) 
+        elif fun == 'tanh':
+            return 1.0 - np.square(np.tanh(z))
+            #return 1.0 - np.square(neural_network.transfer_function(z,'tanh'))
         else:
             return np.multiply(neural_network.transfer_function(z, 'sigmoid'),\
                                (1-neural_network.transfer_function(z, 'sigmoid')))
@@ -75,6 +81,7 @@ class neural_network:
         
         # training, test
         split = int(self.x.shape[1] * self.training_size)
+        indices = np.random.permutation(self.x.shape[1])
         train_ind = indices[:split]
         test_ind = indices[split:]
         train_x, test_x = self.x[:,train_ind], x[:,test_ind]
@@ -170,15 +177,15 @@ class neural_network:
     def backprop(self, y):
 
         error = (self.activations[-1] - self.y)
-        sp = neural_network.transfer_function(self.intermediate_z[-1], self.transfer_function)
+        sp = neural_network.transfer_function_prime(self.intermediate_z[-1], self.transfer_function)
         delta = np.multiply(error,sp)
         self.delta[-1] = delta
-        
+                
         for i in range(2,self.size):
             l = i - 1
             z = self.intermediate_z[l]
-            sp = neural_network.transfer_function_prime(z, self.transfer_function)
             
+            sp = neural_network.transfer_function(z, self.transfer_function)
             error = np.dot(self.weights[l+1].T, self.delta[l+1])
             delta = np.multiply(error,sp)
             
