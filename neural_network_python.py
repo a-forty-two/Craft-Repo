@@ -9,15 +9,17 @@ layers = [2,5,1]
 
 # ames housing dataset
 train = pd.read_csv('train.csv')
-keep = ['LotArea', 'OverallQual', 'GarageCars', 'FullBath', 'GrLivArea', 'TotalBsmtSF', 'SalePrice']
+keep = ['LotArea', 'OverallQual', 'GarageCars', 'FullBath', 'GrLivArea', 'TotalBsmtSF', 'SalePrice', \
+       'LotFrontage', 'OverallCond', 'MSSubClass', 'YearBuilt']
 for i in train.columns:
     if i in keep: pass
     else: train = train.drop(i,1)
+train = train.fillna(train.mean())
 for i in train.columns:
     train[i] = (train[i] - train[i].min()) / (train[i].max() - train[i].min())
 y = np.matrix(train['SalePrice'])
 x = np.matrix(train.drop('SalePrice',1)).T
-layers = [6,3,1]
+layers = [10,25,1]
 
 class neural_network:
     
