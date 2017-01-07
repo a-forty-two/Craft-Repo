@@ -88,7 +88,51 @@ class node:
             return 'In the given state a {enter_move} is not possible.'.format(enter_move = move)
         
         
+class stack:
+
+    def __init__(self, init_state):
+        self.init_state = init_state
+        self.lst = []
+    
+    def add(self, key):
+        self.lst.append(key)
+    
+    def pop(self):
+        return self.lst[-1]
         
+    def reset_state(self, key):
+        self.init_state = key
+
+
+class queue:
+    
+    def __init__(self, init_state):
+        self.init_state = init_state
+        self.lst = []
+    
+    def add(self, key):
+        self.lst.append(key)
+    
+    def tail(self):
+        return self.lst[0]
+        
+    def reset_state(self, key):
+        self.init_state = key
+
+ 
+class searchTree:
+    
+
+
+
+
+
+
+
+
+
+
+      
 easy = [1,3,4,8,6,2,7,0,5]      
 goal = [1,2,3,8,0,4,7,6,5]
 
