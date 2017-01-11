@@ -14,7 +14,7 @@ class node:
         ~ right_child = the right child of the node, if applicable, initialized to null     
                                                                                                
         upon initialization, the get_moves method is run to store the types                 
-        of moves that can be made in the current state                                                                                                                                                                                                              !
+        of moves that can be made in the current state                                                                                                                                                                                                              
         '''
                 
         self.key = key
@@ -86,7 +86,6 @@ class node:
         using said state.
         
         goal state
-
                                     ---------
                                     | 1 2 3 |
                                     | 8 0 4 |
@@ -137,12 +136,9 @@ class node:
         else:
             return 'this move is not possible'
         
-             
-
+        
 class searchTreeSolver:
-    
-     
-    
+
     '''
     to figure out how much the heuristic cost is,
     we zip the values of the current state and goal state
@@ -159,8 +155,7 @@ class searchTreeSolver:
             else:
                 continue
         return h_cost
-    
-    
+
     '''
     to calcualte the manhattan distance, we just need to 
     find the absolute value of stateN - goalN summation.  
@@ -168,10 +163,10 @@ class searchTreeSolver:
     we find the index of where it is in the goal and the state
     and take the absolute value.  this returns the distance
     between the value for all pieces.
-    '''
-    
-    @staticmethod 
-    def manhattan_distance(state, goal):    
+    ''' 
+        
+    @staticmethod
+    def manhattan_distance(state, goal):
         h_cost = 0
         for x in goal:
             h_cost += abs(goal.index(x) - state.index(x))
@@ -181,14 +176,12 @@ class searchTreeSolver:
     def heuristic_function_self_def():
         pass
 
-
     '''
     using the above, we calculate the above cost for each move
-    '''
+    ''' 
     
     @staticmethod
     def get_heuristic_cost(cost_function, state, goal):
-        
         if cost_function == 'manhattan_distance':
             return searchTreeSolver.manhattan_distance(state,goal) 
             
@@ -197,11 +190,11 @@ class searchTreeSolver:
             
         else:
             print 'There is something wrong with the distance function you entered.'
-        
+            
     '''
     this method is used to return the cost for a star
     search.
-    '''
+    '''          
     
     @staticmethod 
     def get_a_star_cost(h_cost, q_cost):
@@ -219,7 +212,6 @@ class searchTreeSolver:
         ~ goal_state = a list of the goal state
         ~ cost_function = from the array ('manhattan_distance', 'heuristic_function')
         returns the cost of the move
-                                                                                                                                                                                                                                                                                                          !
         '''
         
         self.root = node_init.state
@@ -234,7 +226,6 @@ class searchTreeSolver:
     
         '''                                                                                           
         get_move_cost 
-                                                                                                                                                                                                                                                                                                          !
         '''
         
         for move in self.current_node.moves[0]:
@@ -300,10 +291,34 @@ class searchTreeSolver:
                 print ' --- --- --- ','     ',' --- --- --- '
                 break
         
-easy = [1,3,4,8,6,2,7,0,5]      
+# create test variables
+from datetime import datetime
 goal = [1,2,3,8,0,4,7,6,5] 
+
+# easy using breadth first
+start = datetime.now()
+easy = [1,3,4,8,6,2,7,0,5]
 test_node = node(0,easy)
 test_tree = searchTreeSolver(test_node, goal, 'heuristic_function')
 test_tree.breadth_first_search_solver()
+finish = datetime.now()
+print 'Time: ', finish - start # 1 second, 730 moves
 
+# medium using breadth first
+start = datetime.now()
+medium =[2,8,1,0,4,3,7,6,5]
+test_node = node(0,medium)
+test_tree = searchTreeSolver(test_node, goal, 'heuristic_function')
+test_tree.breadth_first_search_solver()
+finish = datetime.now()
+print 'Time: ', finish - start # 42 seconds, 50714 moves
+
+# hard using breadth first
+start = datetime.now()
+hard = [5,6,7,4,0,8,3,2,1]  
+test_node = node(0,hard) 
+test_tree = searchTreeSolver(test_node, goal, 'heuristic_function')
+test_tree.breadth_first_search_solver()
+finish = datetime.now()
+print 'Time: ', finish - start # error, didn't finish
 
