@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="librec-core">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/librec-core.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
