@@ -1,12 +1,12 @@
 class gameBoard:
 
-    # returns a new board state
     @staticmethod
     def make_move(board,row,column,piece):
-        board[row,column] = piece
-        return board
+        import copy
+        new_board = copy.copy(board)
+        new_board[row,column] = piece
+        return new_board
 
-    # returns an integer
     @staticmethod
     def get_score(board,piece):
         score = 0
@@ -41,7 +41,6 @@ class gameBoard:
             else:  r_counter += 1
         return score
 
-    # returns nested list of moves | [[0,8],[1,8],[2,8],[3,8]...]
     @staticmethod
     def get_moves(board):
         c_counter = 0
@@ -62,34 +61,26 @@ class gameBoard:
                 pass
         return moves
 
-    # initializes a 9x9 game board
-    # self.board
-    # self.mover
-    def __init__(self):
-        import numpy as np
-        self.board = np.chararray((9,9))
-        self.board[:] = '*'
-        self.mover = 'Human'
-
     @staticmethod
     def alpha_beta_pruning(board,depth,alpha,beta,player):
-
-        #print depth
-        #print '\n'
-        #print board
-        #print '\n'
+        print '\n'
+        print board
+        print '\n'
 
         if depth == 0:
             return gameBoard.get_score(board,'A') - gameBoard.get_score(board,'H')
 
         else:
+
             if player == 'H':
+
                 v = -10000000
                 moves = gameBoard.get_moves(board)
 
                 for move in moves:
                     new_board = gameBoard.make_move(board,move[1],move[0],'H')
-                    v = max(v, gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'A'))
+                    cost = gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'A')
+                    v = max(v,cost)
                     alpha = max(alpha,v)
 
                     if beta <= alpha:
@@ -97,17 +88,16 @@ class gameBoard:
                     else:
                         continue
 
-                return v
-
-
             else:
 
                 v = 10000000
                 moves = gameBoard.get_moves(board)
 
                 for move in moves:
+
                     new_board = gameBoard.make_move(board, move[1], move[0], 'A')
-                    v = min(v, gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'H'))
+                    cost = gameBoard.alpha_beta_pruning(new_board, depth - 1, alpha, beta, 'H')
+                    v = min(v,cost)
                     beta = min(beta, v)
 
                     if beta <= alpha:
@@ -115,14 +105,20 @@ class gameBoard:
                     else:
                         continue
 
-                return v
+            return v
+
+    def __init__(self):
+        import numpy as np
+        self.board = np.chararray((9,9))
+        self.board[:] = '*'
+        self.mover = 'Human'
+
 
 
 
 test = gameBoard()
-
-gameBoard.alpha_beta_pruning(test.board,2,-100000000,10000000,'H')
-
+tester = test.board[:]
+gameBoard.alpha_beta_pruning(tester,2,-100000000,10000000,'H')
 
 
 
