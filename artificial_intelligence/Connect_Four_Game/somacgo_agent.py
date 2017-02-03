@@ -63,23 +63,20 @@ class gameBoard:
 
     @staticmethod
     def alpha_beta_pruning(board,depth,alpha,beta,player):
-        print '\n'
-        print board
-        print '\n'
 
         if depth == 0:
             return gameBoard.get_score(board,'A') - gameBoard.get_score(board,'H')
 
         else:
 
-            if player == 'H':
+            if player == 'A':
 
                 v = -10000000
                 moves = gameBoard.get_moves(board)
 
                 for move in moves:
-                    new_board = gameBoard.make_move(board,move[1],move[0],'H')
-                    cost = gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'A')
+                    new_board = gameBoard.make_move(board,move[1],move[0],'A')
+                    cost = gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'H')
                     v = max(v,cost)
                     alpha = max(alpha,v)
 
@@ -95,10 +92,10 @@ class gameBoard:
 
                 for move in moves:
 
-                    new_board = gameBoard.make_move(board, move[1], move[0], 'A')
-                    cost = gameBoard.alpha_beta_pruning(new_board, depth - 1, alpha, beta, 'H')
+                    new_board = gameBoard.make_move(board, move[1], move[0], 'H')
+                    cost = gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'A')
                     v = min(v,cost)
-                    beta = min(beta, v)
+                    beta = min(beta,v)
 
                     if beta <= alpha:
                         break
@@ -107,18 +104,57 @@ class gameBoard:
 
             return v
 
+
     def __init__(self):
         import numpy as np
         self.board = np.chararray((9,9))
         self.board[:] = '*'
-        self.mover = 'Human'
+        self.mover = 'H'
+
+    def play_game(self, depth):
+
+        # this will be used to tell when to end the game
+        game_bool = True
+
+        while game_bool:
+
+            # check to make sure there is open spaces
+            if sum(sum(np.char.count(self.board, '*'))) == 0:
+                game_bool = False
+            else:
+                continue
+
+            # show the board
+            print self.board
+
+            if self.mover == 'Human':
+
+                # get the list of moves for our user
+                possible_moves = gameBoard.get_moves(self.board)
+                print possible_moves, '\n'
+
+                # user enters the moves
+                column = eval(raw_input("Enter a column: "))
+                row = eval(raw_input('Enter a row: '))
+
+                # update board and change player
+                self.board[row, column] = 'H'
+                self.mover = 'AI'
+
+
+
+
+            else: # AI agent
+
+                # update the board
+                self.board[row, column] = 'A'
+                self.mover = 'Human'
 
 
 
 
 test = gameBoard()
-tester = test.board[:]
-gameBoard.alpha_beta_pruning(tester,2,-100000000,10000000,'H')
+gameBoard.alpha_beta_pruning(test.board,3,-100000000,10000000,'A')
 
 
 
