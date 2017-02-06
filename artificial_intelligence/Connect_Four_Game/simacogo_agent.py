@@ -57,7 +57,6 @@ class gameBoard:
                                 score += 2
                             else:
                                 score += 1
-
                         else:
                             pass
 
@@ -132,8 +131,8 @@ class gameBoard:
                 for move in moves:
 
                     new_board = gameBoard.make_move(board,move[0],move[1],'A')
-                    v = max(v,gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'H',limit, move_cost))
-                    alpha = max(alpha,v)
+                    running_cost = max(running_cost,gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'H',limit, move_cost))
+                    alpha = max(alpha,running_cost)
 
                     if beta <= alpha: break
                     else: pass
@@ -155,8 +154,8 @@ class gameBoard:
                 for move in moves:
 
                     new_board = gameBoard.make_move(board, move[0], move[1], 'H')
-                    running_cost = min(v,gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'A',limit,move_cost))
-                    beta = min(beta,v)
+                    running_cost = min(running_cost,gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'A',limit,move_cost))
+                    beta = min(beta,running_cost)
 
                     if beta <= alpha: break
                     else: continue
@@ -240,7 +239,7 @@ class gameBoard:
 
 # the game can be played using the below, where only the depth
 # has to be defined and the play_game method called
-depth = 3
+depth = 6
 test = gameBoard(depth)
 test.play_game()
 
