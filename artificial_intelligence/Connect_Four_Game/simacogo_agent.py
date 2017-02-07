@@ -239,7 +239,7 @@ class gameBoard:
 
 # the game can be played using the below, where only the depth
 # has to be defined and the play_game method called
-depth = 6
+depth = 2
 test = gameBoard(depth)
 test.play_game()
 
