@@ -18,6 +18,7 @@ class gameBoard:
         new_board[row,column] = piece
         return new_board
 
+
     @staticmethod
     def get_score(board,piece):
 
@@ -36,7 +37,7 @@ class gameBoard:
             # the 8 neighbor pieces are found
             if value == piece:
 
-                adj = [[r+1,c],[r-1,c],[r,c+1],[r+1,c-1],\
+                adj = [[r+1,c],[r-1,c],[r,c+1],[r,c-1],\
                        [r+1,c+1],[r+1,c-1],[r-1,c+1],[r-1,c-1]]
 
                 for i in adj:
@@ -66,7 +67,8 @@ class gameBoard:
             else:
                 continue
 
-        return score
+        return score/2
+
 
     @staticmethod
     def get_moves(board):
@@ -96,8 +98,10 @@ class gameBoard:
 
         return moves
 
+
     @staticmethod
     def alpha_beta_pruning(board,depth,alpha,beta,player,limit,move_cost):
+
         '''
         :param board: a 9x9 numpy array
         :param depth: the depth to test min max
@@ -114,7 +118,7 @@ class gameBoard:
 
         # if the depth is 0, this means we have hit the bottom of the min-max
         # algorithm and we begin retruning costs
-        if depth == 0:
+        if depth == 0: 
             return gameBoard.get_score(board,'A') - gameBoard.get_score(board,'H')
 
         else:
@@ -125,22 +129,22 @@ class gameBoard:
             # we can stop looking at this node
             if player == 'A':
 
-                running_cost = -1000
+                running_cost_alpha = -100000
                 moves = gameBoard.get_moves(board)
 
                 for move in moves:
 
                     new_board = gameBoard.make_move(board,move[0],move[1],'A')
-                    running_cost = max(running_cost,gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'H',limit, move_cost))
-                    alpha = max(alpha,running_cost)
+                    running_cost_alpha = max(running_cost_alpha,gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'H',limit, move_cost))
+                    alpha = max(alpha,running_cost_alpha)
 
-                    if beta <= alpha: break
+                    if beta <= alpha: return alpha
                     else: pass
 
-                    if depth == limit: move_cost.append([move,running_cost])
+                    if depth == limit: move_cost.append([move,alpha])
                     else: pass
 
-                return running_cost
+                return alpha
 
             else:
 
@@ -148,21 +152,22 @@ class gameBoard:
                 # that is overwritten by finding the min of v and the cost, returned
                 # from alpha beta prunning, beta is used to test the prunning, if beta
                 # is less than alpha, we don't need to continue testing the children of this node
-                running_cost = 1000
+                running_cost_beta = 100000
                 moves = gameBoard.get_moves(board)
 
                 for move in moves:
 
                     new_board = gameBoard.make_move(board, move[0], move[1], 'H')
-                    running_cost = min(running_cost,gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'A',limit,move_cost))
-                    beta = min(beta,running_cost)
+                    running_cost_beta = min(running_cost_beta,gameBoard.alpha_beta_pruning(new_board,depth-1,alpha,beta,'A',limit,move_cost))
+                    beta = min(beta,running_cost_beta)
 
-                    if beta <= alpha: break
-                    else: continue
+                    if beta <= alpha: return beta
+                    else: pass
 
-                return running_cost
+                return beta
 
     def __init__(self,depth):
+
         '''
         :param depth: the depth alpha beta prunning will be applied
         :attr board: a 9x9 numpy array storing the game state
@@ -176,6 +181,7 @@ class gameBoard:
          this is a class that will initialize a 9x9 gameboard to play
          to samcogo.  what a tremendous game it is
         '''
+
         import numpy as np
         self.board = np.chararray((9,9))
         self.board[:] = '*'
@@ -184,12 +190,15 @@ class gameBoard:
         self.depth = depth
         self.limit = depth
 
+
     def play_game(self):
 
         import numpy as np
         game_bool = True
 
         while game_bool:
+
+            print 'Human:',gameBoard.get_score(self.board,'H'), '\n', 'AI:',gameBoard.get_score(self.board,'A'), '\n'
 
             # if there is no moves left, we end the game
             if sum(sum(np.char.count(self.board, '*'))) == 0: game_bool = False
@@ -223,28 +232,25 @@ class gameBoard:
 
                 # looking at the possible moves and costs
                 # we find the maximum cost move and proceed
-                # to make the move
+                # to make the move, the shuffle is to help randomize
+                # ties in the cost
+                import numpy as np
+                np.random.shuffle(self.cost_move)
                 for i in self.cost_move:
 
                     if i[1] > max: move = i[0]
                     else: continue
 
                 self.board[move[0], move[1]] = 'A'
+                self.cost_move = []
                 self.mover = 'H'
 
         # after the board is filled up, we print out the final board and score
-        print 'Final Score', '\n','Human:',gameBoard.get_score(self.board,'H'),\
-            '\n','AI Agent:', gameBoard.get_score(self.board,'A')
+        print 'Final Score', '\n','Human:',gameBoard.get_score(self.board,'H'),'\n','AI Agent:', gameBoard.get_score(self.board,'A')
 
 
 # the game can be played using the below, where only the depth
 # has to be defined and the play_game method called
-depth = 2
+depth = 5
 test = gameBoard(depth)
 test.play_game()
-
-
-
-
-
-
