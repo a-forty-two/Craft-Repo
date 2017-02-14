@@ -329,7 +329,7 @@ easy = [1,3,4,8,6,2,7,0,5]
 medium = [2,8,1,0,4,3,7,6,5]
 hard = [5,6,7,4,0,8,3,2,1]
 tester = [1,0,3,8,2,4,7,6,5]
-hfun = 'euclidean'
+hfun = 'out_of_position'
 salgo = 'a_star'
 ideep = False
 test_node = node(key=0,state=hard,parent=0,g_of_n=0,depth=0,h_function=hfun,goal=goal,move='Initial State')
