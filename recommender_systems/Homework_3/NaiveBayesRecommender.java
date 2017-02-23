@@ -20,8 +20,8 @@ public class NaiveBayesRecommender extends AbstractRecommender
 
     protected SparseMatrix m_featureMatrix;
     protected double m_threshold;
-    protected DenseMatrix m_featureLogOdds;
-    protected double [] m_userBias;
+    protected DenseMatrix featureLogOdds;
+    protected double [] userBias;
 
     @Override
     public void setup() throws LibrecException {
@@ -82,87 +82,121 @@ public class NaiveBayesRecommender extends AbstractRecommender
 
     public void trainModel () {
 
-        int userSize = trainMatrix.numRows(); // trainMatrix = U x F matrix
-        int featureSize = m_featureMatrix.numColumns(); // trainMatrix = U x F matrix
+        // number of users in the data and number of features in the
+        // data, U x F matrix
+        int numUsers = trainMatrix.numRows();
+        int numFeatures = m_featureMatrix.numColumns();
 
-        int positiveVotes;
-        int negativeVotes;
-        int [] positiveCount = new int[featureSize];
-        int [] negativeCount = new int[featureSize];
-        Arrays.fill(positiveCount,new Integer(0));
-        Arrays.fill(negativeCount,new Integer(0));
-        m_featureLogOdds = new DenseMatrix(userSize, featureSize);
-        m_userBias = new double[userSize];
+        // these are used to say if the user liked
+        // or disliked the items
+        int itemsLikes;
+        int itemsDislike;
 
-        for (int row = 0; row < userSize; row++) {
+        // likes and dislikes for each feature
+        int[] featuresLikes = new int[numFeatures];
+        int[] featuresDislike = new int[numFeatures];
 
-            positiveVotes = 0;
-            negativeVotes = 0;
+        // initialize the hashmaps to 0
+        Arrays.fill(featuresLikes, new Integer(0));
+        Arrays.fill(featuresDislike, new Integer(0));
 
+        // matrix that has the log odds for each feature
+        featureLogOdds = new DenseMatrix(numUsers, numFeatures);
+
+        userBias = new double[numUsers];
+
+        for (int row = 0; row < numUsers; row++) {
+
+            // likes for the features
+            itemsLikes = 0;
+            itemsDislike = 0;
+
+            // this get's the user and how they rated the items
             SparseVector itemVector = trainMatrix.row(row);
-            Iterator<VectorEntry> itemIter = itemVector.iterator();
+            Iterator<VectorEntry> item_ir = itemVector.iterator();
 
+            while (item_ir.hasNext()) {
 
-            while (itemIter.hasNext()) {
-
-                VectorEntry ratingEntry = itemIter.next(); // sparse vector
-
+                VectorEntry ratingEntry = item_ir.next();
                 double rating = ratingEntry.get();
                 int item = ratingEntry.index();
 
-
+                // if the rating is greater then the threshold then
+                // we add it to the toal ratings
                 if (rating > m_threshold) {
-                    positiveVotes++;
+                    itemsLikes++;
                 } else if (rating > 0) {
-                    negativeVotes++;
+                    itemsDislike++;
                 }
 
                 SparseVector featureVector = m_featureMatrix.row(item);
-                Iterator<VectorEntry> featureIter = featureVector.iterator();
+                Iterator<VectorEntry> feature_ir = featureVector.iterator();
 
+                while (feature_ir.hasNext()) {
 
-                while (featureIter.hasNext()) {
-
-
-                    VectorEntry featureEntry = featureIter.next();
+                    VectorEntry featureEntry = feature_ir.next();
                     int feature = featureEntry.index();
 
                     if (rating > m_threshold) {
-                        positiveCount[feature]++;
+                        featuresLikes[feature]++;
                     } else if (rating > 0) {
-                        negativeCount[feature]++;
+                        featuresDislike[feature]++;
                     }
-
                 }
 
-            }
 
-            positiveVotes++;
-            negativeVotes++;
-            m_userBias[row] = Math.log(positiveVotes/negativeVotes);
+                // user bias = p(L) / p(DL)
+                double total_ratings = itemsLikes + itemsDislike;
+                double prob_like = (double) itemsLikes / total_ratings;
+                double prob_dislike = (double) itemsDislike / total_ratings;
+                userBias[row] = prob_like / prob_dislike;
 
-            for (int f = 0; f < featureSize; f++) {
-                double probPos = ((double) positiveCount[f]+1) / positiveVotes;
-                double probNeg = ((double) negativeCount[f]+1) / negativeVotes;
 
-                m_featureLogOdds.set(row, f, Math.log(probPos/probNeg));
+                for (int f = 0; f < numFeatures; f++) {
+
+                    // get the probability of the feature
+                    // p(f)
+                    //System.out.println(row);
+                    //System.out.println(f);
+                    double prob_feature = (double)(featuresLikes[f] + featuresDislike[f] + 1) / (total_ratings + 1);
+
+
+                    // get the probability of the feature given like and dislike
+                    // p(f|l) and p(f|dl)
+                    double prob_feature_like = (double)(featuresLikes[f] + 1) / (itemsLikes + 1);
+                    double prob_feature_dislike = (double)(featuresDislike[f] + 1) / (itemsDislike + 1);
+
+
+                    // get the probability of like and dislike given feature
+                    // p(l|f) and p(dl|f)
+                    double prob = (prob_feature_like * prob_feature + 1) / (prob_feature_dislike * prob_feature + 1);
+                    featureLogOdds.set(row, f, Math.log(prob));
+
+                }
             }
         }
     }
 
 
     public double predict (int user, int item) {
-        double logOdds = 0;
 
+        double aggregate_feature_log_odds = 0;
+        SparseVector featureVector = m_featureMatrix.row(item);
+        Iterator<VectorEntry> featureIter = featureVector.iterator();
 
-        for (int f = 0; f < m_featureMatrix.numColumns(); f++) {
-            logOdds += m_featureLogOdds.get(user, f);
+        while (featureIter.hasNext()) {
+
+            VectorEntry featureEntry = featureIter.next();
+            int feature = featureEntry.index();
+            aggregate_feature_log_odds += featureLogOdds.get(user, feature);
         }
-        logOdds += m_userBias[user];
 
-        double probLiked = Math.exp(logOdds) / (Math.exp(logOdds) + 1);
+        aggregate_feature_log_odds += userBias[user];
+
+        double probLiked = Math.exp(aggregate_feature_log_odds) / (Math.exp(aggregate_feature_log_odds) + 1);
         double range = maxRate - minRate;
-        return (probLiked * range) + minRate;
+        double pred = (probLiked * range) + minRate;
+        return pred;
 
     }
 
