@@ -13,15 +13,16 @@ import net.librec.math.structure.*;
 
 
 @ModelData({"isRanking", "trainMatrix"})
-public class NaiveBayesRecommender extends AbstractRecommender
-{
+public class NaiveBayesRecommender extends AbstractRecommender {
 
     private static final int BSIZE = 1024 * 1024;
 
     protected SparseMatrix m_featureMatrix;
     protected double m_threshold;
-    protected DenseMatrix featureLogOdds;
-    protected double [] userBias;
+    protected DenseMatrix probFeatureLike;
+    protected DenseMatrix probFeatureDislike;
+    protected double[] probLikeMatrix;
+    protected double[] probDislikeMatrix;
 
     @Override
     public void setup() throws LibrecException {
@@ -79,40 +80,43 @@ public class NaiveBayesRecommender extends AbstractRecommender
         LOG.info("Loaded item features from " + contentPath);
     }
 
+    public void trainModel() throws LibrecException {
 
-    public void trainModel () {
-
-        // number of users in the data and number of features in the
-        // data, U x F matrix
+        // number of users and features
         int numUsers = trainMatrix.numRows();
         int numFeatures = m_featureMatrix.numColumns();
+
+        // store the prob_like
+        // store the prob_dislike
+        probLikeMatrix = new double[numUsers];
+        probDislikeMatrix = new double[numUsers];
+
+        // store the probability of feature given like
+        // store the probability of feature given dislike
+        probFeatureLike = new DenseMatrix(numUsers, numFeatures);
+        probFeatureDislike = new DenseMatrix(numUsers, numFeatures);
 
         // these are used to say if the user liked
         // or disliked the items
         int itemsLikes;
         int itemsDislike;
 
-        // likes and dislikes for each feature
-        int[] featuresLikes = new int[numFeatures];
-        int[] featuresDislike = new int[numFeatures];
+        for (int u = 0; u < numUsers; u++) {
 
-        // initialize the hashmaps to 0
-        Arrays.fill(featuresLikes, new Integer(0));
-        Arrays.fill(featuresDislike, new Integer(0));
-
-        // matrix that has the log odds for each feature
-        featureLogOdds = new DenseMatrix(numUsers, numFeatures);
-
-        userBias = new double[numUsers];
-
-        for (int row = 0; row < numUsers; row++) {
-
-            // likes for the features
+            // initialize like and dislike counter to 0
             itemsLikes = 0;
             itemsDislike = 0;
 
-            // this get's the user and how they rated the items
-            SparseVector itemVector = trainMatrix.row(row);
+            // likes and dislikes for each feature
+            int[] featuresLikes = new int[numFeatures];
+            int[] featuresDislike = new int[numFeatures];
+
+            // initialize the hashmaps to 0
+            Arrays.fill(featuresLikes, new Integer(0));
+            Arrays.fill(featuresDislike, new Integer(0));
+
+            // gather the list of features for each item
+            SparseVector itemVector = trainMatrix.row(u);
             Iterator<VectorEntry> item_ir = itemVector.iterator();
 
             while (item_ir.hasNext()) {
@@ -121,17 +125,20 @@ public class NaiveBayesRecommender extends AbstractRecommender
                 double rating = ratingEntry.get();
                 int item = ratingEntry.index();
 
-                // if the rating is greater then the threshold then
-                // we add it to the toal ratings
+                // see if the item was liked or disliked and
+                // increment accordingly
                 if (rating > m_threshold) {
                     itemsLikes++;
                 } else if (rating > 0) {
                     itemsDislike++;
                 }
 
+                // get all the features for the item
                 SparseVector featureVector = m_featureMatrix.row(item);
                 Iterator<VectorEntry> feature_ir = featureVector.iterator();
 
+                // go through all the features and increment the like
+                // counters for the feature or dislike
                 while (feature_ir.hasNext()) {
 
                     VectorEntry featureEntry = feature_ir.next();
@@ -144,61 +151,81 @@ public class NaiveBayesRecommender extends AbstractRecommender
                     }
                 }
 
-
-                // user bias = p(L) / p(DL)
+                // calculate the probability of like and dislike for the user
                 double total_ratings = itemsLikes + itemsDislike;
-                double prob_like = (double) itemsLikes / total_ratings;
-                double prob_dislike = (double) itemsDislike / total_ratings;
-                userBias[row] = prob_like / prob_dislike;
+                double prob_like = (double) (itemsLikes + 1) / (total_ratings + 2);
+                double prob_dislike = (double) (itemsDislike + 1) / (total_ratings + 2);
+
+                // add to the probability matrices
+                probLikeMatrix[u] = prob_like;
+                probDislikeMatrix[u] = prob_dislike;
 
 
                 for (int f = 0; f < numFeatures; f++) {
 
-                    // get the probability of the feature
-                    // p(f)
-                    //System.out.println(row);
-                    //System.out.println(f);
-                    double prob_feature = (double)(featuresLikes[f] + featuresDislike[f] + 1) / (total_ratings + 1);
+                    // get the probabilites of the feature given like and dislike
+                    double prob_feature_like = (double) (featuresLikes[f] + 1) / (itemsLikes + 1);
+                    double prob_feature_dislike = (double) (featuresDislike[f] + 1) / (itemsDislike + 1);
 
-
-                    // get the probability of the feature given like and dislike
-                    // p(f|l) and p(f|dl)
-                    double prob_feature_like = (double)(featuresLikes[f] + 1) / (itemsLikes + 1);
-                    double prob_feature_dislike = (double)(featuresDislike[f] + 1) / (itemsDislike + 1);
-
-
-                    // get the probability of like and dislike given feature
-                    // p(l|f) and p(dl|f)
-                    double prob = (prob_feature_like * prob_feature + 1) / (prob_feature_dislike * prob_feature + 1);
-                    featureLogOdds.set(row, f, Math.log(prob));
+                    // set the values in the matrix
+                    probFeatureLike.set(u, f, prob_feature_like);
+                    probFeatureDislike.set(u, f, prob_feature_dislike);
 
                 }
             }
         }
     }
 
+    @Override
+    public double predict(int user, int item) throws LibrecException {
 
-    public double predict (int user, int item) {
+        // running prob like * prob feature given like
+        // running prob dislike * prob feature given dislike
+        double run_prob_dislike = 0;
+        double run_prob_like = 0;
 
-        double aggregate_feature_log_odds = 0;
+        // get the user probability of like and dislike
+        double prob_like = probLikeMatrix[user];
+        double prob_dislike = probDislikeMatrix[user];
+
+        // get the features for the user
         SparseVector featureVector = m_featureMatrix.row(item);
-        Iterator<VectorEntry> featureIter = featureVector.iterator();
+        List<Integer> featureIndexVect = featureVector.getIndexList();
 
-        while (featureIter.hasNext()) {
+        for (int feature : featureVector.getIndexList()) {
 
-            VectorEntry featureEntry = featureIter.next();
-            int feature = featureEntry.index();
-            aggregate_feature_log_odds += featureLogOdds.get(user, feature);
+            // probability of feature given like
+            // probability of feature given dislike
+            double like_feature = probFeatureLike.get(user, feature);
+            double dislike_feature = probFeatureDislike.get(user, feature);
+
+            // intermediate like and dislike values
+            double inter_like = like_feature * prob_like;
+            double inter_dislike = dislike_feature * prob_dislike;
+
+            // increment totals
+            run_prob_like += inter_like;
+            run_prob_dislike += inter_dislike;
+
         }
 
-        aggregate_feature_log_odds += userBias[user];
+        // calculate k
+        double k = 1/(run_prob_like + run_prob_dislike);
 
-        double probLiked = Math.exp(aggregate_feature_log_odds) / (Math.exp(aggregate_feature_log_odds) + 1);
-        double range = maxRate - minRate;
-        double pred = (probLiked * range) + minRate;
-        return pred;
+        // calculate probability of like given feature
+        // calculate probability of dislike given feature
+        double prob_like_feature = k * run_prob_like;
+        double prob_dislike_feature = k * run_prob_dislike;
+
+        // get the log likliehood
+        double logliklihood = Math.log(prob_like_feature / prob_dislike_feature);
+
+        // use logit to get a probability
+        double prob_like_final = Math.exp(logliklihood) / (1 + Math.exp(logliklihood));
+
+        // make the final prediction
+        return minRate + prob_like_final * (maxRate - minRate);
 
     }
-
-
 }
+
