@@ -194,6 +194,8 @@ public class NaiveBayesRecommender extends AbstractRecommender {
 
         for (int feature : featureVector.getIndexList()) {
 
+            // used the calculate the k constant
+
             // probability of feature given like
             // probability of feature given dislike
             double like_feature = probFeatureLike.get(user, feature);
