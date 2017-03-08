@@ -332,6 +332,6 @@ tester = [1,0,3,8,2,4,7,6,5]
 hfun = 'out_of_position'
 salgo = 'a_star'
 ideep = False
-test_node = node(key=0,state=hard,parent=0,g_of_n=0,depth=0,h_function=hfun,goal=goal,move='Initial State')
+test_node = node(key=0,state=easy,parent=0,g_of_n=0,depth=0,h_function=hfun,goal=goal,move='Initial State')
 test = searchTreeSolver(test_node,goal_state=goal,search_algorithm=salgo,iterative_deep=ideep)
 
