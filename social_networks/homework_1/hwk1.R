@@ -65,9 +65,11 @@ print(g)
 
 # ---- Extra ----
 # Visualization with weighted degree and weighted edges
-# we created label weightings, by using the weighted degree
-# above, adding 1 to get ride of 0s and then dividing by two
-# this created visually appealing results
-V(dining)$label.cex = (g.weighted + 1)/2
-plot(dining, vertex.label=V(dining)$id, vertex.size = g.weighted, edge.arrow.size= .25, edge.width = wt)
+# to get ride of 0s in weighted degree, I added 1
+# the multiplication and division of weights is 
+# for visualization purposes.
+V(dining)$label.cex = (g.weighted + 1) / 2
+wt.viz = wt*4
+g.vertex.weights = g.weighted * 4
+plot(dining, vertex.label=V(dining)$id, vertex.size = g.vertex.weights, edge.arrow.size= .25, edge.width = wt.viz)
 
