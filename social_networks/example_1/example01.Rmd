@@ -1,0 +1,62 @@
+---
+title: "Example 1"
+author: "Brian Craft"
+date: "April 1, 2017"
+output: html_document
+---
+
+```{r}
+library(knitr)
+setwd("~/Documents/Craft-Repo/social_networks/example_1")
+read_chunk("example01.R")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load packages
+
+```{r C1, results="hide", warning=FALSE, message=FALSE}
+```
+
+### Load the data
+
+```{r C2}
+```
+
+### Graph information
+```{r C3}
+```
+
+### Graph elements
+```{r C4}
+```
+
+### Histogram
+```{r C5, fig.height=4, fig.width=4}
+```
+
+GGPlot version
+```{r C6, fig.height=3, fig.width=4}
+```
+
+### Network visualization
+```{r C7}
+```
+
+### Degree distribution
+```{r C8}
+```
+
+### Histogram
+```{r C9, fig.height=3, fig.width=4}
+```
+
+### Degree distribution by sex
+Setting up the data
+```{r C10}
+```
+
+Plotting
+```{r C11, fig.height=3, fig.width=4}
+```
+
+
