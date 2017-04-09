@@ -1,0 +1,130 @@
+---
+title: "Example 2"
+author: "Brian Craft"
+date: "April 8, 2017"
+output: html_document
+---
+
+```{r}
+library(knitr)
+setwd("~/Documents/Craft-Repo/social_networks/example_2")
+read_chunk("example02.R")
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Working with different types of data
+
+### Step 1: Load the necessary libraries and data
+
+```{r C1, results="hide", warning=FALSE, message=FALSE}
+
+```
+
+Loading the Southern Women network (Davis data). GraphML format.
+
+```{r C2}
+```
+
+### Step 2: Examine the bipartite network
+Verify that it is bipartite.
+
+```{r C3}
+
+```
+
+Plot using bipartite layout (better if rotated)
+```{r C4}
+
+```
+
+Look at labels and types
+
+```{r C5}
+
+```
+
+So, FALSE is people
+
+### Step 3: Create projection
+
+Create person-person projection
+
+```{r C6}
+
+```
+
+Plot the projected graph
+```{r C7}
+
+```
+
+Plot the distribution of edge weights
+```{r C8}
+
+```
+
+### Step 4: Filtered version of the network
+
+Create a new network removing the edges of weight 1 and 2.
+
+```{r C9}
+
+```
+
+
+Plot the weighted degree distribution of the new network
+```{r C10}
+
+```
+
+### Step 5: Ego networks
+
+Extract the ego networks for Laura and Sylvia
+
+```{r C11}
+
+```
+
+Plot side-by-side use layout_as_star
+```{r C12}
+
+
+```
+
+Compare the two ego networks by weighted degree. First create data frame with the right structure.
+
+wdeg, ego
+10, Laura
+24, Sylvia
+34, Laura
+
+```{r C13}
+
+```
+
+Then plotting with ggplot is straightforward.
+
+```{r C14}
+
+```
+
+### Step 6: New example: loading edge and attribute data
+
+Load CSV files for edges and attributes. stringAsFactors is
+false because we can't use factors as node attributes.
+
+```{r C15}
+
+```
+
+Convert to a graph from the two data frames. Note that the
+names of the vertices in the edge data frame have to match the
+first column of the vertices data frame.
+
+```{r C16}
+```
+
+Plot
+
+```{r C17}
+
+```

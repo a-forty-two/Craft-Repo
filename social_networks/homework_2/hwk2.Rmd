@@ -1,0 +1,167 @@
+---
+title: "Homework 2 (CSC 495)"
+author: "Brian Craft"
+date: "Spring 2017"
+output: html_document
+---
+
+## Working with the Beer Advocate data
+### Bipartite networks and ego networks
+
+```{r}
+library(knitr)
+setwd("~/Documents/Craft-Repo/social_networks/homework_2")
+
+read_chunk("hwk2.R")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Step 1: Load libraries
+
+```{r C1, results="hide", warning=FALSE, message=FALSE}
+```
+
+### Step 2: Load the data _1 pt_
+
+Load a bipartite network built from the "Beer Advocate"
+review data. For the purposes of this assignment, I selected
+only very active users (> 1000 reviews), chose the beers with the
+very top ratings (> 4.5 out of 5) and looked at just "American
+IPA" style beers. This gives a network of managable size with
+278 nodes (131 beers and 147 users). 
+
+The data is in edgelist and attribute form, so we have to 
+shape it into a network first. The two files are
+
+- beer_edges.csv
+- beer_attrs.csv
+
+```{r, C2}
+
+```
+
+### Step 3: Use graph.data.frame to convert to graph _1 pt_
+
+```{r, C3}
+
+```
+
+### Step 4: Looking at attributes _1 pt_
+
+List the vertex attributes and note that most attributes are 
+for beers. We don't have attributes for users.
+
+Use the ```head``` function to list the first 6 (head) beer 
+names (not the numeric IDs)
+```{r, C4}
+
+```
+
+### Step 5: Projection _1 pt_
+
+Compute the user-user and beer-beer projections and print
+the ```summary``` information for each.
+
+```{r, C5}
+
+```
+
+### Step 6: Fixing the attributes _1 pt_
+
+Remove the irrelevant attributes from the user-user network.
+Print the summary at the end. It should show only "name" and
+"weight" attributes. Use `delete_vertex_attr`.
+
+```{r, C6}
+
+```
+
+### Step 7: Plot the edge weight distribution _2 pt_
+
+You can use either base plotting or ggplot. Label your plots
+appropriately (x and y axes, main title). Make sure that the whole distribution
+is included -- set x axis limits correctly.
+
+```{r, C7}
+
+```
+
+### Step 8: Filter out edges of weight < 6 _2 pts_
+
+As is typical with projections of bipartite networks, we'll
+filter out the low weight edges of which there are very many.
+
+```{r, C8}
+
+```
+
+### Step 9: Remove singletons (nodes of degree == 0) _1 pt_
+
+Removing edges leaves some nodes disconnected from the network
+so we remove them also. Another way to do this would be
+calculate the largest (giant) component.
+
+```{r, C9}
+
+```
+
+### Note: _Use the filtered version of the network for the rest of the assignment._
+
+### Step 10: Plot the network _1 pt_
+
+The graph is now simplified enough that it can be visualized. Use the Kamada-Kawai
+layout: `layout=layout_with_kk`.
+
+```{r, C10}
+
+```
+
+### Step 11: Weighted degree _2 pt_
+
+Compute a histogram of the weighted degree. (`graph.strength` function)
+
+```{r, C11}
+
+```
+
+### Step 12: Find outliers _2 pt_
+
+Find the names of the two individuals with highest weighted
+degree (2 outliers)
+
+```{r, C12}
+
+```
+### Step 13: Compute the ego networks _1 pt_
+
+Compute the ego networks for these two users.
+```{r, C13}
+
+```
+
+### Step 14: Plot the ego networks side by side _1 pt_
+Use par(mfrow=c(1,2)) to get the side-by-side layout. Remember to switch back to the normal layout c(1,1) after.
+
+```{r, C14}
+
+```
+
+### Step 15: Question _3 pts_
+
+In reducing the size of the network through edge and vertex
+filtering (steps 8 and 9) so that it is easier to visualize, 
+what information about the original user-user network has been
+lost? What consequences does this have for our interpretation
+of the filtered version of the network?
+
+It's possible that by removing weights less than 6 
+many singeltons were created, which was step 8.  Then
+in step 9, we remove the singeltons, which may have been
+because of step 8.  In conjunction, we lost a lot of information
+about less active users, since they are not rating as many items,
+which could mean selectivity.  For instance, perhaps many of those 
+individuals rated the same selective number of beers because
+they are from the same area.  Essentially, we lose information
+on how the less engaged users are connected.
+
+
