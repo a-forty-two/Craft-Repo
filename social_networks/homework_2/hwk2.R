@@ -82,10 +82,11 @@ egos = make_ego_graph(u2u.beer.filt, 1, c(12,26))
 deuane = egos[[1]]
 mikesgroove = egos[[2]]
 
+
 # ---- C14 ----
 # Plot ego networks
-lo_deuane = layout_as_star(deuane)
-lo_mikesgroove = layout_as_star(mikesgroove)
+lo_deuane = layout_as_star(deuane, V(deuane)[5])
+lo_mikesgroove = layout_as_star(mikesgroove, V(mikesgroove)[15])
 par(mfrow = c(1,2))
 plot(deuane, layout = lo_deuane)
 plot(mikesgroove, layout = lo_mikesgroove)

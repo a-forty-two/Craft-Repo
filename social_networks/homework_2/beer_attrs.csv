@@ -1,0 +1,279 @@
+"beer_id","brewery","beer name","alcohol","type"
+"33624","Hoppin' Frog Brewery","Hoppin' To Heaven IPA",6.8,TRUE
+"4373","Harmon Restaurant & Brewery","Point Defiance IPA",6.1,TRUE
+"5441","Founders Brewing Company","Founders Centennial IPA",7.2,TRUE
+"505","Cambridge Brewing Company","Big Man Ale",6.8,TRUE
+"20478","Founders Brewing Company","Founders Harvest Ale",6.5,TRUE
+"37477","Sierra Nevada Brewing Co.","Sierra Nevada Anniversary Ale (2007-2009)",5.9,TRUE
+"5487","Terminal Gravity Brewing Company","Terminal Gravity IPA",6.9,TRUE
+"42533","Sierra Nevada Brewing Co.","Sierra Nevada Southern Hemisphere Harvest Fresh Hop Ale",6.7,TRUE
+"52371","Sierra Nevada Brewing Co.","Sierra Nevada Estate Brewers Harvest Ale",6.7,TRUE
+"1904","Sierra Nevada Brewing Co.","Sierra Nevada Celebration Ale",6.8,TRUE
+"30420","Sierra Nevada Brewing Co.","Sierra Nevada Torpedo Extra IPA",7.2,TRUE
+"6549","Sierra Nevada Brewing Co.","Northern Hemisphere Harvest Wet Hop Ale",6.7,TRUE
+"62328","Sierra Nevada Brewing Co.","Estate Homegrown Wet Hop Ale",6.7,TRUE
+"44749","Sierra Nevada Brewing Co.","Sierra Nevada Chico Estate Harvest Wet Hop Ale (2008)",6.7,TRUE
+"12896","Four Peaks Brewing Company","Hop Knot",6.7,TRUE
+"33243","Port Brewing Company / Pizza Port","Wipeout I.P.A.",7,TRUE
+"1493","SweetWater Brewing Company","Sweetwater IPA",6.3,TRUE
+"33467","Port Brewing Company / Pizza Port","High Tide Fresh Hop IPA",6.5,TRUE
+"46363","Cigar City Brewing","Jai Alai IPA",7.5,TRUE
+"50081","Cigar City Brewing","Jai Alai IPA - Cedar Aged (Humidor Series)",7.5,TRUE
+"52390","Port Brewing Company / Pizza Port","Pseudo IPA",6.6,TRUE
+"59173","Cigar City Brewing","Jai Alai IPA - White Oak",7.5,TRUE
+"55417","Cigar City Brewing","Jai Alai IPA - Peach",7.5,TRUE
+"9088","Southern Tier Brewing Company","IPA (India Pale Ale)",7.3,TRUE
+"2751","Bear Republic Brewing Co.","Racer 5 India Pale Ale",7,TRUE
+"3916","AleSmith Brewing Company","AleSmith IPA",7.25,TRUE
+"22505","Green Flash Brewing Co.","Green Flash West Coast I.P.A.",7.3,TRUE
+"5133","Arbor Brewing Company","Arbor Brewing Sacred Cow IPA",6.8,TRUE
+"11922","Great Divide Brewing Company","Titan IPA",7.1,TRUE
+"55081","New Belgium Brewing","Ranger",6.5,TRUE
+"60832","Great Divide Brewing Company","Rumble IPA",7.1,TRUE
+"8312","Southampton Publick House","Southampton IPA",6.5,TRUE
+"16376","Brasserie Dieu Du Ciel","Corne Du Diable",6.5,TRUE
+"205","Flying Dog Brewery","Snake Dog IPA",7.1,TRUE
+"57252","Boston Beer Company (Samuel Adams)","Samuel Adams Latitude 48 IPA",6,TRUE
+"35608","Kern River Brewing Company","Just Outstanding IPA",6.8,TRUE
+"6368","Minneapolis Town Hall Brewery","Masala Mama India Pale Ale",5.9,TRUE
+"38799","Minneapolis Town Hall Brewery","Mango Mama",6,TRUE
+"16779","The Tap Brewing Company","Leatherlips IPA",5,TRUE
+"43101","Tröegs Brewing Company","Scratch Beer 12 - 2008",6.5,TRUE
+"62416","Tröegs Brewing Company","Scratch Beer 35 - 2010 (Fresh Hop Ale)",7.2,TRUE
+"1472","Speakeasy Ales & Lagers","Big Daddy IPA",6.5,TRUE
+"1956","New Glarus Brewing Company","Hop Hearty Ale",6.1,TRUE
+"1483","Weyerbacher Brewing Co.","Hops Infusion",6.2,TRUE
+"361","Rogue Ales","Brutal Bitter Ale",5.8,TRUE
+"43969","Rogue Ales","Yellow Snow IPA",6.2,TRUE
+"38180","Firestone Walker Brewing Co.","Union Jack India Pale Ale",7.5,TRUE
+"709","Ballast Point Brewing Company","Big Eye IPA",7,TRUE
+"23407","Willimantic Brewing Co.","Willimantic Pushing The Envelope IPA",6.5,TRUE
+"20389","Thomas Hooker Brewing Company","Thomas Hooker Hop Meadow IPA",6.5,TRUE
+"29619","Ballast Point Brewing Company","Sculpin India Pale Ale",7,TRUE
+"311","Harpoon Brewery","Harpoon IPA",5.9,TRUE
+"2729","Avery Brewing Company","India Pale Ale (IPA)",6.5,TRUE
+"20335","OPA-OPA Steakhouse & Brewery","Opa Opa IPA",6,TRUE
+"42007","Mayflower Brewing Company","Mayflower IPA",7,TRUE
+"32286","Alpine Beer Company","Nelson",7.1,TRUE
+"27604","Alpine Beer Company","Duet IPA",7,TRUE
+"40502","Alpine Beer Company","O'Brien's IPA",6.2,TRUE
+"41872","Laurelwood Public House & Brewery","Workhorse IPA",7.5,TRUE
+"6076","Ithaca Beer Company","Flower Power India Pale Ale",7.5,TRUE
+"60670","Ithaca Beer Company","Super Friends IPA",6,TRUE
+"60044","Ninkasi Brewing Company","Maiden The Shade",6.8,TRUE
+"60750","Boneyard Beer Company","RPM IPA",7.5,TRUE
+"12322","Boulder Beer / Wilderness Pub","Mojo IPA",7.2,TRUE
+"3977","Pelican Pub & Brewery","India Pelican Ale",7.5,TRUE
+"48243","Ska Brewing Co.","Modus Hoperandi",6.8,TRUE
+"5385","Dark Horse Brewing Company","Dark Horse Crooked Tree IPA",6,TRUE
+"22189","Sixpoint Brewery","Bengali Tiger",6.4,TRUE
+"56889","Two Brothers Brewing Company","Resistance IPA",6.9,TRUE
+"33215","Columbus Brewing Company","Columbus IPA",6.5,TRUE
+"1670","Lost Coast Brewery and Cafe","Indica India Pale Ale",6.5,TRUE
+"829","Mad River Brewing Company","Jamaica Sunset India Pale Ale",7,TRUE
+"49058","Central City Brewing","Red Racer IPA",6.5,TRUE
+"28203","Surly Brewing Company","Furious",6.2,TRUE
+"53267","Surly Brewing Company","Wet",7.5,TRUE
+"35626","Odell Brewing Company","Odell IPA",7,TRUE
+"7200","Full Sail Brewery & Tasting Room & Pub","Wreck The Halls",6.5,TRUE
+"37340","Full Sail Brewery & Tasting Room & Pub","Sun Of Spot (Brewmaster Reserve 2007)",6,TRUE
+"28793","Mikkeller ApS","Simcoe Single Hop IPA",6.9,TRUE
+"58534","Sun King Brewing Company","Grapefruit Jungle IPA",7.5,TRUE
+"33670","Mikkeller ApS","Stateside IPA",7,TRUE
+"29688","Mikkeller ApS","Cascade Single Hop IPA",6.8,TRUE
+"48458","Mikkeller ApS","Nelson Sauvin Single Hop IPA",6.9,TRUE
+"88","Stone Brewing Co.","Stone IPA (India Pale Ale)",6.9,TRUE
+"34436","Stone Brewing Co.","Stone IPA Double Dry Hopped",6.9,TRUE
+"1093","Bell's Brewery, Inc.","Two Hearted Ale",7,TRUE
+"611","Anderson Valley Brewing Company","Hop Ottin' IPA",7,TRUE
+"5554","Big Sky Brewing Company","Big Sky IPA",6.2,TRUE
+"3358","Snoqualmie Falls Brewing Company & Taproom","Wildcat India Pale Ale",6.6,TRUE
+"49704","The Brew Kettle Taproom & Smokehouse / Production Works","Red Eye PA",7,TRUE
+"20969","Oaken Barrel Brewing Company","Superfly I.P.A.",7.5,TRUE
+"2519","Marin Brewing Company","Marin India Pale Ale",7,TRUE
+"17492","Saint Arnold Brewing Company","Saint Arnold Elissa IPA",6.6,TRUE
+"43385","Tyranena Brewing Company","Scurvy",6.5,TRUE
+"16403","Smuttynose Brewing Company","Smuttynose IPA ""Finest Kind""",6.9,TRUE
+"26073","Sand Creek Brewing Company","Wild Ride IPA",6,TRUE
+"9182","Left Hand Brewing Company","Warrior IPA",7.6,TRUE
+"4902","Tyranena Brewing Company","Bitter Woman India Pale Ale",5.75,TRUE
+"12335","Tyranena Brewing Company","Bitter Woman From Hell Extra IPA",NA,TRUE
+"22790","Russian River Brewing Company","Blind Pig IPA",6.1,TRUE
+"1616","Watch City Brewing Co.","Hops Explosion IPA",6,TRUE
+"39705","Russian River Brewing Company","Russian River IPA",6.75,TRUE
+"59163","Russian River Brewing Company","Registration Ale",7.5,TRUE
+"6509","Russian River Brewing Company","HopTime Harvest Ale",6.75,TRUE
+"6108","Dogfish Head Brewery","60 Minute IPA",6,TRUE
+"3951","Dogfish Head Brewery","ApriHop",7,TRUE
+"17900","Short's Brewing Company","Short's Huma-Lupa-Licious IPA",6.9,TRUE
+"15758","Dogfish Head Brewery","75 Minute IPA",7.5,TRUE
+"40188","Selin's Grove Brewing Company","Olde Frosty IPA",NA,TRUE
+"17443","Selin's Grove Brewing Company","India Pale Ale",7,TRUE
+"36585","Selin's Grove Brewing Company","SNAFU IPA",7.2,TRUE
+"25755","Heavy Seas Beer","Heavy Seas - Loose Cannon (Hop3 Ale)",7.25,TRUE
+"403","North Coast Brewing Co.","ACME California IPA",6.5,TRUE
+"2904","New Holland Brewing Company","New Holland Mad Hatter India Pale Ale",5.25,TRUE
+"4571","Mash House Restaurant & Brewery, The","Hoppy Hour IPA",5.9,TRUE
+"59760","Half Acre Beer Company","Shewolf",7.8,TRUE
+"29127","Three Floyds Brewing Co. & Brewpub","Broo Doo",7,TRUE
+"916","Lagunitas Brewing Company","Lagunitas IPA",6.2,TRUE
+"15018","The Alchemist Pub & Brewery","Holy Cow IPA",5.16,TRUE
+"1746","Stone Coast Brewing Co.","420 India Pale Ale",6.9,TRUE
+"5219","Portsmouth Brewery","Portsmouth Bottle Rocket IPA",6.5,TRUE
+"16940","LaConner Brewing Company","India Pale Ale (Dry Hopped / Bottleworks)",7,TRUE
+"28024","Deschutes Brewery","Hop Henge India Pale Ale",7,TRUE
+"29209","Deschutes Brewery","Inversion IPA",6.8,TRUE
+"48098","Deschutes Brewery","Red Chair IPA",6.4,TRUE
+"40999","Magic Hat Brewing Company","Lucky Kat",5.8,TRUE
+"31763","Coronado Brewing Company","Islander IPA",7.5,TRUE
+"20781","21st Amendment Brewery","21st Amendment IPA",7,TRUE
+"1005","Victory Brewing Company","HopDevil Ale",6.7,TRUE
+"59672","Hill Farmstead Brewery","Hill Farmstead Citra IPA",5.5,TRUE
+"22787","Alaskan Brewing Co.","Alaskan IPA",6.2,TRUE
+"aerozeppl",NA,NA,NA,FALSE
+"alexgash",NA,NA,NA,FALSE
+"allergictomacros",NA,NA,NA,FALSE
+"alleykatking",NA,NA,NA,FALSE
+"Arbitrator",NA,NA,NA,FALSE
+"argock",NA,NA,NA,FALSE
+"ArrogantB",NA,NA,NA,FALSE
+"atsprings",NA,NA,NA,FALSE
+"avalon07",NA,NA,NA,FALSE
+"barleywinefiend",NA,NA,NA,FALSE
+"bditty187",NA,NA,NA,FALSE
+"Beerandraiderfan",NA,NA,NA,FALSE
+"BEERchitect",NA,NA,NA,FALSE
+"BeerSox",NA,NA,NA,FALSE
+"biegaman",NA,NA,NA,FALSE
+"Bierman9",NA,NA,NA,FALSE
+"Bighuge",NA,NA,NA,FALSE
+"billab914",NA,NA,NA,FALSE
+"Bitterbill",NA,NA,NA,FALSE
+"blitheringidiot",NA,NA,NA,FALSE
+"bobsy",NA,NA,NA,FALSE
+"Brad007",NA,NA,NA,FALSE
+"brentk56",NA,NA,NA,FALSE
+"brewdlyhooked13",NA,NA,NA,FALSE
+"BuckeyeNation",NA,NA,NA,FALSE
+"canucklehead",NA,NA,NA,FALSE
+"ccrida",NA,NA,NA,FALSE
+"ClockworkOrange",NA,NA,NA,FALSE
+"cokes",NA,NA,NA,FALSE
+"corby112",NA,NA,NA,FALSE
+"cpetrone84",NA,NA,NA,FALSE
+"CrellMoset",NA,NA,NA,FALSE
+"crossovert",NA,NA,NA,FALSE
+"Cyberkedi",NA,NA,NA,FALSE
+"Derek",NA,NA,NA,FALSE
+"Deuane",NA,NA,NA,FALSE
+"DogFood11",NA,NA,NA,FALSE
+"DoubleJ",NA,NA,NA,FALSE
+"drabmuh",NA,NA,NA,FALSE
+"DrJay",NA,NA,NA,FALSE
+"drpimento",NA,NA,NA,FALSE
+"dyan",NA,NA,NA,FALSE
+"feloniousmonk",NA,NA,NA,FALSE
+"ffejherb",NA,NA,NA,FALSE
+"flexabull",NA,NA,NA,FALSE
+"Floydster",NA,NA,NA,FALSE
+"francisweizen",NA,NA,NA,FALSE
+"Frozensoul327",NA,NA,NA,FALSE
+"garymuchow",NA,NA,NA,FALSE
+"Gavage",NA,NA,NA,FALSE
+"GbVDave",NA,NA,NA,FALSE
+"GCBrewingCo",NA,NA,NA,FALSE
+"GClarkage",NA,NA,NA,FALSE
+"Georgiabeer",NA,NA,NA,FALSE
+"gford217",NA,NA,NA,FALSE
+"glid02",NA,NA,NA,FALSE
+"Gmann",NA,NA,NA,FALSE
+"granger10",NA,NA,NA,FALSE
+"Gueuzedude",NA,NA,NA,FALSE
+"Halcyondays",NA,NA,NA,FALSE
+"Haybeerman",NA,NA,NA,FALSE
+"Hojaminbag",NA,NA,NA,FALSE
+"HopHead84",NA,NA,NA,FALSE
+"Huhzubendah",NA,NA,NA,FALSE
+"illidurit",NA,NA,NA,FALSE
+"IntriqKen",NA,NA,NA,FALSE
+"JamesS",NA,NA,NA,FALSE
+"Jason",NA,NA,NA,FALSE
+"JoeyBeerBelly",NA,NA,NA,FALSE
+"johnmichaelsen",NA,NA,NA,FALSE
+"jrallen34",NA,NA,NA,FALSE
+"jwc215",NA,NA,NA,FALSE
+"jwinship83",NA,NA,NA,FALSE
+"KarlHungus",NA,NA,NA,FALSE
+"kbutler1",NA,NA,NA,FALSE
+"Kegatron",NA,NA,NA,FALSE
+"kingcrowing",NA,NA,NA,FALSE
+"kmpitz2",NA,NA,NA,FALSE
+"ktrillionaire",NA,NA,NA,FALSE
+"lackenhauser",NA,NA,NA,FALSE
+"lacqueredmouse",NA,NA,NA,FALSE
+"largadeer",NA,NA,NA,FALSE
+"LilBeerDoctor",NA,NA,NA,FALSE
+"magictrokini",NA,NA,NA,FALSE
+"marc77",NA,NA,NA,FALSE
+"MasterSki",NA,NA,NA,FALSE
+"maximum12",NA,NA,NA,FALSE
+"mcallister",NA,NA,NA,FALSE
+"mdfb79",NA,NA,NA,FALSE
+"Mebuzzard",NA,NA,NA,FALSE
+"mentor",NA,NA,NA,FALSE
+"merlin48",NA,NA,NA,FALSE
+"Metalmonk",NA,NA,NA,FALSE
+"mikesgroove",NA,NA,NA,FALSE
+"Mitchster",NA,NA,NA,FALSE
+"msubulldog25",NA,NA,NA,FALSE
+"mynie",NA,NA,NA,FALSE
+"nickd717",NA,NA,NA,FALSE
+"northyorksammy",NA,NA,NA,FALSE
+"nrbw23",NA,NA,NA,FALSE
+"Offa",NA,NA,NA,FALSE
+"orbitalr0x",NA,NA,NA,FALSE
+"Overlord",NA,NA,NA,FALSE
+"OWSLEY069",NA,NA,NA,FALSE
+"Phatz",NA,NA,NA,FALSE
+"pmcadamis",NA,NA,NA,FALSE
+"ppoitras",NA,NA,NA,FALSE
+"prototypic",NA,NA,NA,FALSE
+"RblWthACoz",NA,NA,NA,FALSE
+"RBorsato",NA,NA,NA,FALSE
+"Reagan1984",NA,NA,NA,FALSE
+"RedDiamond",NA,NA,NA,FALSE
+"Reidrover",NA,NA,NA,FALSE
+"rhoadsrage",NA,NA,NA,FALSE
+"Rifugium",NA,NA,NA,FALSE
+"RonfromJersey",NA,NA,NA,FALSE
+"RoyalT",NA,NA,NA,FALSE
+"russpowell",NA,NA,NA,FALSE
+"rye726",NA,NA,NA,FALSE
+"scruffwhor",NA,NA,NA,FALSE
+"sholland119",NA,NA,NA,FALSE
+"Slatetank",NA,NA,NA,FALSE
+"srandycarter",NA,NA,NA,FALSE
+"stakem",NA,NA,NA,FALSE
+"sulldaddy",NA,NA,NA,FALSE
+"TastyTaste",NA,NA,NA,FALSE
+"tavernjef",NA,NA,NA,FALSE
+"tempest",NA,NA,NA,FALSE
+"thagr81us",NA,NA,NA,FALSE
+"TheLongBeachBum",NA,NA,NA,FALSE
+"TheManiacalOne",NA,NA,NA,FALSE
+"Thorpe429",NA,NA,NA,FALSE
+"tpd975",NA,NA,NA,FALSE
+"TurdFurgison",NA,NA,NA,FALSE
+"UnionMade",NA,NA,NA,FALSE
+"Vancer",NA,NA,NA,FALSE
+"wagenvolks",NA,NA,NA,FALSE
+"Wasatch",NA,NA,NA,FALSE
+"WesWes",NA,NA,NA,FALSE
+"womencantsail",NA,NA,NA,FALSE
+"woodychandler",NA,NA,NA,FALSE
+"woosterbill",NA,NA,NA,FALSE
+"WVbeergeek",NA,NA,NA,FALSE
+"yemenmocha",NA,NA,NA,FALSE
+"ZAP",NA,NA,NA,FALSE
+"zeff80",NA,NA,NA,FALSE
+"Zorro",NA,NA,NA,FALSE

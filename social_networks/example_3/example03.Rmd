@@ -1,0 +1,62 @@
+---
+title: "Example 3"
+author: "Robin Burke"
+date: "4/9/2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+library(knitr)
+setwd("~/Documents/Craft-Repo/social_networks/example_3")
+read_chunk("example03.R")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Working with centrality measures
+
+In this example, we compare different centrality measures on the
+Krackhardt friend and advice networks. 
+
+### Load the necessary libraries
+```{r C1, results="hide", warning=FALSE, message=FALSE}
+```
+
+### Load the Krackhardt data.
+```{r C2}
+```
+
+### Look at summary data
+```{r C3}
+```
+
+### Plot networks
+```{r C4}
+```
+
+### Compare diameters
+```{r C5}
+```
+
+### Compute centrality measures of the friend graph
+```{r C6}
+```
+
+### Produce correlation plot
+```{r C7, fig.height=3}
+```
+
+### Compute centrality measures of the advice graph
+```{r C8}
+```
+
+### Produce correlation plot
+```{r C9, fig.height=3}
+```
+
+### Compare in-degree distributions
+Out-degree is less interesting.
+```{r C10, fig.height=3}
+```
+
+
